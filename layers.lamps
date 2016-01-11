@@ -8,6 +8,14 @@ create_box	        1 graphene_space
 read_dump               graphene_sheet.lammpstrj 0 x y z box no add yes
 # read_dump               graphene_sheet.dat x y z box no format molfile lammpstrj "c:\Program Files\University of Illinois\VMD\plugins\WIN32\molfile\"
 
+# Insert C60 object
+molecule		C60 C60.mol
+
+create_atoms		0 single 25 25 -10 mol C60 123 units box
+
+# That would be a fullerenic crystal
+# create_atoms		0 region graphene_space mol C60 123 units box
+
 
 mass 1 10
 
