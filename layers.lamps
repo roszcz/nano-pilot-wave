@@ -2,22 +2,24 @@ units                   real   # uwaga inny typ jednostek
 atom_style              charge # uwaga inny styl atomow
 boundary                f f f
 
-region		        graphene_space block -90 90 -90 90 -90 90 units box
-create_box	        1 graphene_space 
+region		        sim_space block -90 90 -90 90 -90 90 units box
+create_box	        1 sim_space 
+
+mass 1 10
 
 read_dump               graphene_sheet.lammpstrj 0 x y z box no add yes
 # read_dump               graphene_sheet.dat x y z box no format molfile lammpstrj "c:\Program Files\University of Illinois\VMD\plugins\WIN32\molfile\"
 
 # Insert C60 object
+region                  fulleren_space block 20 30 20 30 -15 -5 units box
 molecule		C60 C60.mol
 
 create_atoms		0 single 25 25 -10 mol C60 123 units box
 
+group                   fulleren region fulleren_space
+
 # That would be a fullerenic crystal
-# create_atoms		0 region graphene_space mol C60 123 units box
-
-
-mass 1 10
+# create_atoms		0 region sim_space mol C60 123 units box
 
 # Potential settings
 neighbor        	0.5 bin 
@@ -26,9 +28,19 @@ neigh_modify    	every 1 delay 0
 pair_style              reax/c NULL 
 pair_coeff              * * ffield.reax.cho C
 
+# Add gravity fixed to the ball
+fix                     1 fulleren setforce NULL NULL 0.5 #region fulleren_space
+
 fix                     2 all qeq/reax 1 0.0 10.0 1e-6 reax/c 
 
 dump			MyDump all custom 10 graphene.lammpstrj element x y z
 dump_modify		MyDump sort id element C
 
-run 0
+thermo                  50
+
+timestep 0.5
+
+# Obligatory fix
+fix                     NVE all nve
+
+run 5000
