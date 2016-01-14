@@ -1,0 +1,66 @@
+units                   real   # uwaga inny typ jednostek
+atom_style              charge # uwaga inny styl atomow
+boundary                f f f
+
+region		        sim_space block -8 81 -8 81 -50 50 units box
+create_box	        1 sim_space 
+
+# Create graphene sheet
+region                  graphene_space block -5 105 -5 105 -3 3 units box
+read_dump               graphene_sheet.lammpstrj 0 x y z box no add yes
+group                   graphene region graphene_space
+
+# Mass of carbon
+mass                    1 12
+
+# Insert C60 object
+region                  fulleren_space block 20 30 20 30 -15 -5 units box
+molecule		C60 C60.mol
+create_atoms		0 single 25 25 -10 mol C60 123 units box
+group                   fulleren region fulleren_space
+
+# That would be a fullerenic crystal
+# create_atoms		0 region sim_space mol C60 123 units box
+
+# Potential settings
+# FIXME *neighbor bin* stopped working for some reason
+neighbor        	1.0 nsq
+neigh_modify    	every 1 delay 0
+
+# Type of potential?
+pair_style              reax/c NULL 
+pair_coeff              * * ffield.reax.cho C
+
+# Test temp fix
+# fix                     controltemp all temp/rescale 100 10.0 10.0 10.0 1.0
+fix                     controltemp graphene langevin 1.0 1.1 10.0 48279
+
+# Add gravity fixed to the ball
+fix                     gravity fulleren setforce NULL NULL 1.22 
+
+# Add anti-gravity to the graphene sheet
+# fix                     3 graphene setforce NULL NULL -0.1
+
+# Add harmonic response from the graphene
+fix                     4 graphene spring/self 10.0 z
+
+fix                     1 all qeq/reax 1 0.0 10.0 1e-6 reax/c 
+
+dump			MyDump all custom 10 pilotwave.lammpstrj element x y z
+dump_modify		MyDump sort id element C
+
+thermo                  50
+
+timestep                0.4
+
+# Obligatory fix
+fix                     NVE all nve
+
+# Give some momentum to the fulerene
+run                     700
+
+# Turn off gravity
+unfix                   gravity
+
+# See what gives
+run                     5000
