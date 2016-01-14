@@ -33,16 +33,16 @@ pair_coeff              * * ffield.reax.cho C
 
 # Test temp fix
 # fix                     controltemp all temp/rescale 100 10.0 10.0 10.0 1.0
-fix                     controltemp graphene langevin 1.0 1.1 10.0 48279
+fix                     controltemp graphene langevin 1.0 1.1 300.0 48279
 
 # Add gravity fixed to the ball
-fix                     gravity fulleren addforce 0.0 0.0 2.22 
+fix                     gravity fulleren addforce 0.1 0.1 2.22 
 
 # Add anti-gravity to the graphene sheet
 # fix                     3 graphene setforce NULL NULL -0.1
 
 # Add harmonic response from the graphene
-fix                     4 graphene spring/self 10.0 z
+fix                     4 graphene spring/self 2.0 z
 
 fix                     1 all qeq/reax 1 0.0 10.0 1e-6 reax/c 
 
