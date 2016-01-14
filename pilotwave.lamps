@@ -36,7 +36,7 @@ pair_coeff              * * ffield.reax.cho C
 fix                     controltemp graphene langevin 1.0 1.1 10.0 48279
 
 # Add gravity fixed to the ball
-fix                     gravity fulleren setforce NULL NULL 1.22 
+fix                     gravity fulleren addforce 0.0 0.0 2.22 
 
 # Add anti-gravity to the graphene sheet
 # fix                     3 graphene setforce NULL NULL -0.1
@@ -57,10 +57,10 @@ timestep                0.4
 fix                     NVE all nve
 
 # Give some momentum to the fulerene
-run                     700
-
-# Turn off gravity
-unfix                   gravity
+# run                     700
+#
+# # Turn off gravity
+# unfix                   gravity
 
 # See what gives
 run                     5000
