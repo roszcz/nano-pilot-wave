@@ -14,10 +14,15 @@ group                   graphene region graphene_space
 mass                    1 12.01
 
 # Insert C60 object
-region                  fulleren_space block 20 30 20 30 -15 -5 units box
 molecule		C60 C60.mol
+region                  fulleren_space block 20 30 20 30 -15 -5 units box
 create_atoms		0 single 25 25 -10 mol C60 123 units box
 group                   fulleren region fulleren_space
+
+# Insert another C60 object
+region                  b_fulleren_space block 31 41 20 30 -15 -5 units box
+create_atoms		0 single 35 25 -10 mol C60 123 units box
+group                   b_fulleren region b_fulleren_space
 
 # That would be a fullerenic crystal
 # create_atoms		0 region sim_space mol C60 123 units box
@@ -31,17 +36,6 @@ neigh_modify    	every 1 delay 0
 pair_style              reax/c NULL 
 pair_coeff              * * ffield.reax.cho C
 
-# Also add initial push 
-fix                     pushball fulleren addforce 0.3 0.3 0.0
-
-# Add anti-gravity to the graphene sheet
-# fix                     3 graphene setforce NULL NULL -0.1
-
-# Add harmonic response from the graphene
-fix                     4 graphene spring/self 2.0 z
-
-fix                     1 all qeq/reax 1 0.0 10.0 1e-6 reax/c 
-
 dump			MyDump all custom 10 pilotwave.lammpstrj element x y z
 dump_modify		MyDump sort id element C
 
@@ -52,21 +46,31 @@ timestep                0.4
 # Obligatory fix
 fix                     NVE all nve
 
-# This seem to influence wave propagation on the graphene surface
-# fix                     controltemp all temp/rescale 100 10.0 10.0 10.0 1.0
+# Carbon - carbon potential is here
+fix                     1 all qeq/reax 1 0.0 10.0 1e-6 reax/c 
+
+# Add harmonic response from the graphene
+fix                     4 graphene spring/self 2.0 z
+
+# Stabilize the graphene sheet
 fix                     controltemp graphene langevin 10.0 10.1 50.0 48279
 
-# Give some momentum to the fulerene
-run                     500
+# Also add initial push to give some momentum to the fulerene
+fix                     pushball fulleren addforce 0.0 0.55 0.0
+
+run                     1000
 
 # Turn off gravity
 unfix                   pushball
 
+# Turn off temperature controll (graphene is stable now)
+unfix                   controltemp
+
 # Add gravity fixed to the ball
 fix                     gravity fulleren addforce 0.0 0.0 2.22 
 
-# Turn off temperature controll
-unfix                   controltemp
+# Add gravity fixed to the second ball
+fix                     b_gravity b_fulleren addforce 0.0 0.0 2.22 
 
 # See what gives
-run                     10000
+run                     25000
