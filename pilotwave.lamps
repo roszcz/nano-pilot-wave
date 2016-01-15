@@ -1,5 +1,5 @@
-units                   real   # uwaga inny typ jednostek
-atom_style              charge # uwaga inny styl atomow
+units                   real   
+atom_style              charge
 boundary                f f f
 
 region		        sim_space block -8 81 -8 81 -50 50 units box
@@ -7,11 +7,11 @@ create_box	        1 sim_space
 
 # Create graphene sheet
 region                  graphene_space block -5 105 -5 105 -3 3 units box
-read_dump               graphene_sheet.lammpstrj 0 x y z box no add yes
+read_dump               graphene_sheet.what 0 x y z box no add yes
 group                   graphene region graphene_space
 
 # Mass of carbon
-mass                    1 12
+mass                    1 12.01
 
 # Insert C60 object
 region                  fulleren_space block 20 30 20 30 -15 -5 units box
@@ -31,12 +31,8 @@ neigh_modify    	every 1 delay 0
 pair_style              reax/c NULL 
 pair_coeff              * * ffield.reax.cho C
 
-# Test temp fix
-# fix                     controltemp all temp/rescale 100 10.0 10.0 10.0 1.0
-fix                     controltemp graphene langevin 1.0 1.1 300.0 48279
-
-# Add gravity fixed to the ball
-fix                     gravity fulleren addforce 0.1 0.1 2.22 
+# Also add initial push 
+fix                     pushball fulleren addforce 0.3 0.3 0.0
 
 # Add anti-gravity to the graphene sheet
 # fix                     3 graphene setforce NULL NULL -0.1
@@ -56,11 +52,21 @@ timestep                0.4
 # Obligatory fix
 fix                     NVE all nve
 
+# This seem to influence wave propagation on the graphene surface
+# fix                     controltemp all temp/rescale 100 10.0 10.0 10.0 1.0
+fix                     controltemp graphene langevin 10.0 10.1 50.0 48279
+
 # Give some momentum to the fulerene
-# run                     700
-#
-# # Turn off gravity
-# unfix                   gravity
+run                     500
+
+# Turn off gravity
+unfix                   pushball
+
+# Add gravity fixed to the ball
+fix                     gravity fulleren addforce 0.0 0.0 2.22 
+
+# Turn off temperature controll
+unfix                   controltemp
 
 # See what gives
-run                     5000
+run                     10000
