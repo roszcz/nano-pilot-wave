@@ -2,12 +2,12 @@ units                   real
 atom_style              charge
 boundary                f f f
 
-region		        sim_space block -8 81 -8 81 -50 50 units box
+region		        sim_space block -8 161 -8 161 -50 50 units box
 create_box	        1 sim_space 
 
 # Create graphene sheet
-region                  graphene_space block -5 105 -5 105 -3 3 units box
-read_dump               graphene_sheet.what 0 x y z box no add yes
+region                  graphene_space block -5 160 -5 160 -3 3 units box
+read_dump               huge_sheet.what 0 x y z box no add yes
 group                   graphene region graphene_space
 
 # Mass of carbon
@@ -15,13 +15,13 @@ mass                    1 12.01
 
 # Insert C60 object
 molecule		C60 C60.mol
-region                  fulleren_space block 33 39 33 39 -15 -5 units box
-create_atoms		0 single 36 36 -10 mol C60 123 units box
+region                  fulleren_space block 70 90 70 90 -15 -5 units box
+create_atoms		0 single 80 80 -10 mol C60 123 units box
 group                   fulleren region fulleren_space
 
 # Insert another C60 object
-region                  b_fulleren_space block 40 46 40 46 -15 -5 units box
-create_atoms		0 single 43 43 -10 mol C60 123 units box
+region                  b_fulleren_space block 90 110 90 110 -15 -5 units box
+create_atoms		0 single 100 100 -10 mol C60 123 units box
 group                   b_fulleren region b_fulleren_space
 
 # That would be a fullerenic crystal
@@ -50,7 +50,7 @@ fix                     NVE all nve
 fix                     1 all qeq/reax 1 0.0 10.0 1e-6 reax/c 
 
 # Add harmonic response from the graphene
-fix                     4 graphene spring/self 2.0 z
+fix                     4 graphene spring/self 1.0 z
 
 # Stabilize the graphene sheet
 fix                     controltemp graphene langevin 10.0 10.1 50.0 48279
@@ -74,4 +74,4 @@ fix                     gravity fulleren addforce 0.0 0.0 2.22
 fix                     b_gravity b_fulleren addforce 0.0 0.0 2.22 
 
 # See what gives
-run                     100000
+run                     10000
