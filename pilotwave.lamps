@@ -15,13 +15,13 @@ mass                    1 12.01
 
 # Insert C60 object
 molecule		C60 C60.mol
-region                  fulleren_space block 20 30 20 30 -15 -5 units box
-create_atoms		0 single 25 25 -10 mol C60 123 units box
+region                  fulleren_space block 33 39 33 39 -15 -5 units box
+create_atoms		0 single 36 36 -10 mol C60 123 units box
 group                   fulleren region fulleren_space
 
 # Insert another C60 object
-region                  b_fulleren_space block 31 41 20 30 -15 -5 units box
-create_atoms		0 single 35 25 -10 mol C60 123 units box
+region                  b_fulleren_space block 40 46 40 46 -15 -5 units box
+create_atoms		0 single 43 43 -10 mol C60 123 units box
 group                   b_fulleren region b_fulleren_space
 
 # That would be a fullerenic crystal
@@ -41,7 +41,7 @@ dump_modify		MyDump sort id element C
 
 thermo                  50
 
-timestep                0.4
+timestep                0.35
 
 # Obligatory fix
 fix                     NVE all nve
@@ -55,13 +55,14 @@ fix                     4 graphene spring/self 2.0 z
 # Stabilize the graphene sheet
 fix                     controltemp graphene langevin 10.0 10.1 50.0 48279
 
-# Also add initial push to give some momentum to the fulerene
-fix                     pushball fulleren addforce 0.0 0.55 0.0
+# Also add initial push to give some momentum to the fulerenes
+# fix                     pushball fulleren addforce 0.2 0.2 0.0
+# fix                     b_pushball b_fulleren addforce -0.2 -0.2 0.0
 
-run                     1000
+run                     1000 
 
 # Turn off gravity
-unfix                   pushball
+# unfix                   pushball
 
 # Turn off temperature controll (graphene is stable now)
 unfix                   controltemp
@@ -73,4 +74,4 @@ fix                     gravity fulleren addforce 0.0 0.0 2.22
 fix                     b_gravity b_fulleren addforce 0.0 0.0 2.22 
 
 # See what gives
-run                     25000
+run                     100000
