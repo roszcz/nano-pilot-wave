@@ -15,13 +15,13 @@ mass                    1 12.01
 
 # Insert C60 object
 molecule		C60 C60.mol
-region                  fulleren_space block 70 90 70 90 -15 -5 units box
+region                  fulleren_space block 75 90 75 90 -15 -5 units box
 create_atoms		0 single 80 80 -10 mol C60 123 units box
 group                   fulleren region fulleren_space
 
 # Insert another C60 object
-region                  b_fulleren_space block 90 110 90 110 -15 -5 units box
-create_atoms		0 single 100 100 -10 mol C60 123 units box
+region                  b_fulleren_space block 65 75 65 75 -15 -5 units box
+create_atoms		0 single 70 70 -10 mol C60 123 units box
 group                   b_fulleren region b_fulleren_space
 
 # That would be a fullerenic crystal
@@ -29,7 +29,7 @@ group                   b_fulleren region b_fulleren_space
 
 # Potential settings
 # FIXME *neighbor bin* stopped working for some reason
-neighbor        	1.0 nsq
+neighbor        	1.0 bin
 neigh_modify    	every 1 delay 0
 
 # Type of potential?
@@ -41,7 +41,7 @@ dump_modify		MyDump sort id element C
 
 thermo                  50
 
-timestep                0.35
+timestep                0.65
 
 # Obligatory fix
 fix                     NVE all nve
@@ -56,16 +56,21 @@ fix                     4 graphene spring/self 1.0 z
 fix                     controltemp graphene langevin 10.0 10.1 50.0 48279
 
 # Also add initial push to give some momentum to the fulerenes
-# fix                     pushball fulleren addforce 0.2 0.2 0.0
-# fix                     b_pushball b_fulleren addforce -0.2 -0.2 0.0
+fix                     pushball fulleren addforce -0.2 0.05 0.0
+fix                     b_pushball b_fulleren addforce 0.2 -0.05 0.0
 
 run                     1000 
 
-# Turn off gravity
-# unfix                   pushball
+# Turn off initial pushforces
+unfix                   pushball
+unfix                   b_pushball
 
 # Turn off temperature controll (graphene is stable now)
 unfix                   controltemp
+
+# Add graphene sheet oscillations
+variable                sinForce equal swiggle(0,0.5,666)
+fix                     wavee graphene addforce 0.0 0.0 v_sinForce
 
 # Add gravity fixed to the ball
 fix                     gravity fulleren addforce 0.0 0.0 2.22 
@@ -73,5 +78,8 @@ fix                     gravity fulleren addforce 0.0 0.0 2.22
 # Add gravity fixed to the second ball
 fix                     b_gravity b_fulleren addforce 0.0 0.0 2.22 
 
+# Add viscousity
+fix			vis all viscous 5
+
 # See what gives
-run                     10000
+run                     30000

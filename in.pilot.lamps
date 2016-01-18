@@ -1,0 +1,100 @@
+units                   real   
+atom_style              charge
+boundary                f f f
+
+region		        sim_space block -8 161 -8 161 -50 50 units box
+create_box	        1 sim_space 
+
+# Create graphene sheet
+region                  graphene_space block -5 160 -5 160 -3 3 units box
+read_dump               huge_sheet.what 0 x y z box no add yes
+group                   graphene region graphene_space
+
+# Mass of carbon
+mass                    1 12.01
+
+# Insert C60 object
+molecule		C60 C60.mol
+region                  fulleren_space block 70 90 70 90 -15 -5 units box
+create_atoms		0 single 80 80 -10 mol C60 123 units box
+group                   fulleren region fulleren_space
+
+region			notDel block 60 100 60 100 -30 30 units box
+group			notDel region notDel
+group			del subtract all notDel
+
+delete_atoms		group del
+
+# Insert another C60 object
+region                  b_fulleren_space block 90 110 90 110 -15 -5 units box
+#create_atoms		0 single 100 100 -10 mol C60 123 units box
+#group                   b_fulleren region b_fulleren_space
+
+# That would be a fullerenic crystal
+# create_atoms		0 region sim_space mol C60 123 units box
+
+# Potential settings
+# FIXME *neighbor bin* stopped working for some reason
+neighbor        	1.0 bin
+neigh_modify    	every 1 delay 0
+
+# Type of potential?
+pair_style              reax/c NULL 
+pair_coeff              * * ffield.reax.cho C
+#pair_style              hybrid reax/c NULL lj/cut 5.
+
+#pair_coeff              * * reax/c ffield.reax.cho NULL C
+#pair_coeff		1 2 lj/cut  0.010832 3.345 10
+#pair_coeff		1 1 lj/cut  0.010832 1.445 10
+
+
+dump			MyDump all custom 20 pilotwave.lammpstrj element x y z
+dump_modify		MyDump sort id element C 
+
+thermo                  50
+
+
+# Obligatory fix
+fix                     NVE all nve
+
+# Carbon - carbon potential is here
+fix                     1 all qeq/reax 1 0.0 10.0 1e-6 reax/c 
+
+# Add harmonic response from the graphene
+
+# Stabilize the graphene sheet
+#fix                     controltemp graphene langevin 10.0 10.1 50.0 48279
+
+# Also add initial push to give some momentum to the fulerenes
+# fix                     pushball fulleren addforce 0.2 0.2 0.0
+# fix                     b_pushball b_fulleren addforce -0.2 -0.2 0.0
+
+#run                     1000 
+
+# Turn off gravity
+# unfix                   pushball
+
+# Turn off temperature controll (graphene is stable now)
+#unfix                   controltemp
+
+# Add gravity fixed to the ball
+
+# Add gravity fixed to the second ball
+#fix                     b_gravity b_fulleren addforce 0.0 0.0 2.22 
+
+# See what gives
+
+
+
+# APPLAY PERIODIC FORCE
+
+fix                     gravity fulleren addforce 0.0 0.0 0.5
+timestep                0.8
+variable		sinForce equal swiggle(0,2,2000)
+
+fix                     4 graphene spring/self 2.0 xyz
+fix                     wavee graphene addforce 0.0 0.0 v_sinForce
+
+fix			vis all viscous 10
+
+run                     10000
