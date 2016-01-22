@@ -17,15 +17,15 @@ mass                    1 12.01
 
 # Add single atom of special type
 region                  single_atom block 79 81 79 81 -15 -5 units box
-create_atoms            2 single 80 80 -10 units box
+create_atoms            2 single 80 80 -5 units box
 group                   single_ball region single_atom
 mass                    2 100.1
 
 # Removing atoms for debug agility, remove this TODO
+# region			notDel block 60 100 60 100 -30 30 units box
 # region			notDel block 70 90 70 90 -30 30 units box
-# region			notDel block 65 95 65 95 -30 30 units box
-region			notDel block 60 100 60 100 -30 30 units box
 # region			notDel block 50 110 50 110 -30 30 units box
+region			notDel sphere 80 80 0 40 units box
 group			notDel region notDel
 group			del subtract all notDel
 delete_atoms		group del
@@ -64,32 +64,32 @@ fix                     NVE all nve
 fix                     reactor all qeq/reax 1 0.0 10.0 1e-6 reax/c 
 
 # Add harmonic response from the graphene
-fix                     springness graphene spring/self 1.0 z
+fix                     springness graphene spring/self 0.8 z
 # Is spring needed in the presence of swiggle?
 
 # Stabilize the graphene sheet
-fix                     controltemp graphene langevin 10.0 10.1 50.0 48279
+fix                     controltemp graphene langevin 40.0 40.1 50.0 48279
 
 # Also add initial push to give some momentum to the fulerenes
 # fix                     pushball fulleren addforce -0.2 0.05 0.0
 
-run                     500 
+run                     300 
 
 # Turn off initial pushforces
 # unfix                   pushball
 
 # Turn off temperature controll (graphene is stable now)
-unfix                   controltemp
+# unfix                   controltemp
 
 # Add graphene sheet oscillations
-variable                sinForce equal swiggle(0,1,1000)
+variable                sinForce equal swiggle(0,4,2500)
 fix                     wavee graphene addforce 0.0 0.0 v_sinForce
 
 # Special gravity for special atom
-fix                     c_gravity single_ball addforce 0.0 0.0 4.20
+fix                     c_gravity single_ball addforce 0.0 0.0 6.20
 
 # Add viscousity
-fix			vis all viscous 7
+fix			vis all viscous 5
 
 # See what gives
 run                     30000
