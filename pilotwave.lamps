@@ -16,13 +16,14 @@ group                   graphene region graphene_space
 mass                    1 12.01
 
 # Add single atom of special type
-region                  single_atom block 79 81 79 81 -15 -5 units box
-create_atoms            2 single 80 80 -5 units box
+region                  single_atom block 79 81 79 81 -10 -1 units box
+create_atoms            2 single 80.8 80.8 -3 units box
+create_atoms            2 single 79.1 79.1 -3 units box
 group                   single_ball region single_atom
 mass                    2 500.1
 
 # Removing atoms for debug agility, remove this TODO
-region			notDel sphere 80 80 0 26 units box
+region			notDel sphere 80 80 0 30 units box
 group			notDel region notDel
 group			del subtract all notDel
 delete_atoms		group del
