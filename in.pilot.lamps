@@ -2,8 +2,10 @@ units                   real
 atom_style              charge
 boundary                f f f
 
+processors		* * 1
 region		        sim_space block -8 161 -8 161 -50 50 units box
 create_box	        1 sim_space 
+
 
 # Create graphene sheet
 region                  graphene_space block -5 160 -5 160 -3 3 units box
@@ -23,12 +25,12 @@ region			notDel block 60 100 60 100 -30 30 units box
 group			notDel region notDel
 group			del subtract all notDel
 
-delete_atoms		group del
+#delete_atoms		group del
 
 # Insert another C60 object
 region                  b_fulleren_space block 90 110 90 110 -15 -5 units box
-#create_atoms		0 single 100 100 -10 mol C60 123 units box
-#group                   b_fulleren region b_fulleren_space
+create_atoms		0 single 100 100 -10 mol C60 123 units box
+group                   b_fulleren region b_fulleren_space
 
 # That would be a fullerenic crystal
 # create_atoms		0 region sim_space mol C60 123 units box
@@ -40,7 +42,7 @@ neigh_modify    	every 1 delay 0
 
 # Type of potential?
 pair_style              reax/c NULL 
-pair_coeff              * * ffield.reax.cho C
+pair_coeff              * * ../ffield.reax.cho C
 #pair_style              hybrid reax/c NULL lj/cut 5.
 
 #pair_coeff              * * reax/c ffield.reax.cho NULL C
@@ -88,13 +90,19 @@ fix                     1 all qeq/reax 1 0.0 10.0 1e-6 reax/c
 
 # APPLAY PERIODIC FORCE
 
-fix                     gravity fulleren addforce 0.0 0.0 0.5
-timestep                0.8
-variable		sinForce equal swiggle(0,2,2000)
+fix                     gravity fulleren addforce 0.0 0.0 0.6
+fix                     b_gravity b_fulleren addforce 0.0 0.0 0.6
+timestep                0.5
+variable		sinForce equal swiggle(0,0.5,1200)
 
-fix                     4 graphene spring/self 2.0 xyz
+fix                     4 graphene spring/self 1.0 xyz
 fix                     wavee graphene addforce 0.0 0.0 v_sinForce
+
+
+fix			vis all viscous 200
+
+run			500
 
 fix			vis all viscous 10
 
-run                     10000
+run                     50000
