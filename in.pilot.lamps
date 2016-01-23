@@ -42,7 +42,7 @@ neigh_modify    	every 1 delay 0
 
 # Type of potential?
 pair_style              reax/c NULL 
-pair_coeff              * * ../ffield.reax.cho C
+pair_coeff              * * ffield.reax.cho C
 #pair_style              hybrid reax/c NULL lj/cut 5.
 
 #pair_coeff              * * reax/c ffield.reax.cho NULL C
