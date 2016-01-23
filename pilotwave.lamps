@@ -27,20 +27,16 @@ group			notDel region notDel
 group			del subtract all notDel
 delete_atoms		group del
 
-# TODO Use those to create dedicated 
-# potential and get rid of the fullerenes
+# Declare separate potentials for each possible atom type interaction
 pair_style	        hybrid	reax/c	NULL	lj/cut	10
-
-# TODO adjust parameters
-pair_coeff	        1	2	lj/cut	 0.010832 3.345 10	
+# Carbon - Carbon
+pair_coeff              * * reax/c ffield.reax.cho C NULL
+# Ball - Carbon
+pair_coeff	        1	2	lj/cut	 0.030832 3.345 10	
+# Ball - Ball
 pair_coeff	        2	2	lj/cut	 0.010832 3.345 10	
 
-# Type of potential?
-# pair_style              reax/c NULL 
-pair_coeff              * * reax/c ffield.reax.cho C NULL
-
-# Potential settings
-# FIXME *neighbor bin* stopped working for some reason
+# Some numerical neuances
 neighbor        	1.0 bin
 neigh_modify    	every 1 delay 0
 
@@ -51,6 +47,7 @@ dump_modify		MyDump sort id element C 2
 # Signle atom dump
 dump                    ball single_ball xyz 10 zball.dat
 
+# debug << 
 thermo                  50
 
 timestep                0.85
@@ -58,7 +55,7 @@ timestep                0.85
 # Obligatory fix
 fix                     NVE all nve
 
-# Carbon - carbon potential is here
+# Charge equalibration WTF
 fix                     reactor all qeq/reax 1 0.0 10.0 1e-6 reax/c 
 
 # Add harmonic response from the graphene
@@ -67,17 +64,16 @@ fix                     springness graphene spring/self 0.003 z
 
 # Stabilize the graphene sheet
 fix                     controltemp graphene langevin 1.0 1.1 200.0 48279
-
 run                     700 
 
-# Add graphene sheet oscillations
-variable                sinForce equal swiggle(0,15,2000)
+# Add graphene sheet oscillations (val0, amplitude, period)
+variable                sinForce equal swiggle(15,15,2000)
 # fix                     wavee graphene addforce 0.0 0.0 v_sinForce
 
 # Special gravity for special atom
 # fix                     c_gravity single_ball addforce 0.0 0.0 6.20
 fix                     d_gravity single_ball addforce 0.0 0.0 v_sinForce
-fix                     e_gravity single_ball addforce 0.0 0.0 15.0
+# fix                     e_gravity single_ball addforce 0.0 0.0 15.0
 
 # Add viscousity
 fix			vis all viscous 5

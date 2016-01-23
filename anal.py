@@ -7,7 +7,7 @@ def read_pos(filepath):
         for line in fin:
             vals = line.split()
             if len(vals) is 4:
-                out.append(vals)
+                out.append([float(val) for val in vals])
     return out
 
 if __name__ == "__main__":
@@ -18,11 +18,12 @@ if __name__ == "__main__":
     y = []
     z = []
     for val in pos:
-        x.append(val[1])
-        y.append(val[2])
+        x.append(val[1] - 80)
+        y.append(val[2] - 80)
         z.append(val[3])
 
-    # plt.plot(x)
-    # plt.plot(y)
+    plt.plot(x)
+    plt.plot(y)
     plt.plot(z)
+    plt.legend(['x', 'y', 'z'])
     plt.show()
