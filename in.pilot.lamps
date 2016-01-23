@@ -3,13 +3,13 @@ atom_style              charge
 boundary                f f f
 
 processors		* * 1
-region		        sim_space block -8 161 -8 161 -50 50 units box
+region		        sim_space block -8 320 -8 320 -50 50 units box
 create_box	        1 sim_space 
 
 
 # Create graphene sheet
 region                  graphene_space block -5 160 -5 160 -3 3 units box
-read_dump               huge_sheet.what 0 x y z box no add yes
+read_dump               structures/30nm_30nm_graphene.what 0 x y z box no add yes
 group                   graphene region graphene_space
 
 # Mass of carbon
@@ -17,20 +17,21 @@ mass                    1 12.01
 
 # Insert C60 object
 molecule		C60 C60.mol
-region                  fulleren_space block 70 90 70 90 -15 -5 units box
-create_atoms		0 single 80 80 -10 mol C60 123 units box
+region                  fulleren_space sphere 140 140 -10 5 units box
+create_atoms		0 single 140 140 -10 mol C60 123 units box
 group                   fulleren region fulleren_space
 
-region			notDel block 60 100 60 100 -30 30 units box
+# Insert another C60 object
+region                  b_fulleren_space sphere 160 160 -10 5 units box
+create_atoms		0 single 160 160 -10 mol C60 123 units box
+group                   b_fulleren region b_fulleren_space
+
+# Make membrane circular
+region                  notDel sphere 150 150 0 150 units box
 group			notDel region notDel
 group			del subtract all notDel
 
-#delete_atoms		group del
-
-# Insert another C60 object
-region                  b_fulleren_space block 90 110 90 110 -15 -5 units box
-create_atoms		0 single 100 100 -10 mol C60 123 units box
-group                   b_fulleren region b_fulleren_space
+delete_atoms		group del
 
 # That would be a fullerenic crystal
 # create_atoms		0 region sim_space mol C60 123 units box
@@ -105,4 +106,4 @@ run			500
 
 fix			vis all viscous 10
 
-run                     50000
+run                     500000

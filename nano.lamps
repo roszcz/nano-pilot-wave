@@ -1,0 +1,57 @@
+echo	both
+units                   real   
+atom_style              charge 
+atom_modify map hash sort 1000 2
+boundary                f f f
+
+read_data              nanorurka.dat
+ 
+neighbor        	0.5 bin 
+neigh_modify    	every 1 delay 0
+
+#tworzenie ściskających bloków
+
+region		region1 block -10 10 -10 10 -23.5 -3.5 units box
+lattice		fcc 4.078
+
+create_atoms	2 region region1
+
+region		region2 block -10 10 -10 10 62 82 units box
+lattice		fcc 4.078
+
+create_atoms	2 region region2
+
+#group	blok1	region1	id	2
+#group	blok2	region2	id	2
+
+#velocity	blok1 set 0.0 0.0 10.0 units box
+#velocity	blok2 set 0.0 0.0 -10.0 units box
+
+pair_style	hybrid	reax/c	NULL	eam	lj/cut	10
+pair_coeff	* *	eam	Ag_u3.eam	
+
+pair_coeff * *	reax/c ffield.reax.cho  C	NULL
+
+pair_coeff	1	2	lj/cut	 0.010832 3.345 10	
+neighbor        0.5 bin 
+neigh_modify    every 1 delay 0
+#timestep 0.002
+
+
+# Nowy fix, jest on niezbedny dla reaxa. Oblicza rozklad ladunkow w molekulach
+fix                     2 all qeq/reax 1 0.0 10.0 1e-6 reax/c 
+
+# teraz czas jest w fs (a nie jak w metalu w ps) (1 ps = 1000 fs)
+#timestep       		0.1
+
+#thermo                  100
+
+fix			NVE all nve
+
+dump			MyDump all custom 10 nanorurka444.lammpstrj element x y z
+
+dump_modify		MyDump sort id element C Ag
+
+
+
+run 			0
