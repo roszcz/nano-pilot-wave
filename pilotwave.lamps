@@ -27,9 +27,6 @@ group			notDel region notDel
 group			del subtract all notDel
 delete_atoms		group del
 
-# That would be a fullerenic crystal
-# create_atoms		0 region sim_space mol C60 123 units box
-
 # TODO Use those to create dedicated 
 # potential and get rid of the fullerenes
 pair_style	        hybrid	reax/c	NULL	lj/cut	10
@@ -47,6 +44,7 @@ pair_coeff              * * reax/c ffield.reax.cho C NULL
 neighbor        	1.0 bin
 neigh_modify    	every 1 delay 0
 
+# Full data dump
 dump			MyDump all custom 10 pilotwave.lammpstrj element x y z
 dump_modify		MyDump sort id element C 2
 
@@ -55,7 +53,7 @@ dump                    ball single_ball xyz 10 zball.dat
 
 thermo                  50
 
-timestep                0.55
+timestep                0.85
 
 # Obligatory fix
 fix                     NVE all nve
@@ -64,35 +62,22 @@ fix                     NVE all nve
 fix                     reactor all qeq/reax 1 0.0 10.0 1e-6 reax/c 
 
 # Add harmonic response from the graphene
-fix                     springness graphene spring/self 0.0005 z
+fix                     springness graphene spring/self 0.003 z
 # Is spring needed in the presence of swiggle?
 
 # Stabilize the graphene sheet
 fix                     controltemp graphene langevin 1.0 1.1 200.0 48279
 
-# Write positions of bouncing atom
-# variable                ball_z equal x[1]
-# fix                     ball_data all print 10 "${ball_z}" file dupa.dat
-
-# Also add initial push to give some momentum to the fulerenes
-# fix                     pushball fulleren addforce -0.2 0.05 0.0
-
-run                     300 
-
-# Turn off initial pushforces
-# unfix                   pushball
-
-# Turn off temperature controll (graphene is stable now)
-# unfix                   controltemp
+run                     700 
 
 # Add graphene sheet oscillations
-variable                sinForce equal swiggle(0,10,1500)
+variable                sinForce equal swiggle(0,15,2000)
 # fix                     wavee graphene addforce 0.0 0.0 v_sinForce
 
 # Special gravity for special atom
-fix                     c_gravity single_ball addforce 0.0 0.0 6.20
+# fix                     c_gravity single_ball addforce 0.0 0.0 6.20
 fix                     d_gravity single_ball addforce 0.0 0.0 v_sinForce
-fix                     e_gravity single_ball addforce 0.0 0.0 2.0
+fix                     e_gravity single_ball addforce 0.0 0.0 15.0
 
 # Add viscousity
 fix			vis all viscous 5
