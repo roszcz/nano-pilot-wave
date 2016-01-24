@@ -8,7 +8,7 @@ create_box	        1 sim_space
 
 
 # Create graphene sheet
-region                  graphene_space block -5 160 -5 160 -3 3 units box
+region                  graphene_space block -5 320 -5 320 -3 3 units box
 read_dump               structures/30nm_30nm_graphene.what 0 x y z box no add yes
 group                   graphene region graphene_space
 
@@ -21,20 +21,30 @@ region                  fulleren_space sphere 140 140 -10 5 units box
 create_atoms		0 single 140 140 -10 mol C60 123 units box
 group                   fulleren region fulleren_space
 
+# Keep its center of mass
+compute			fa_com fulleren com
+variable                fa_x_com equal c_fa_com[1]
+variable                fa_y_com equal c_fa_com[2]
+variable                fa_z_com equal c_fa_com[3]
+fix                     a_com_print all print 20 "${fa_x_com} ${fa_y_com} ${fa_z_com}" file data/a_fullerene_pos.dat screen no
+
 # Insert another C60 object
 region                  b_fulleren_space sphere 160 160 -10 5 units box
 create_atoms		0 single 160 160 -10 mol C60 123 units box
 group                   b_fulleren region b_fulleren_space
 
+# Get center of mass for the second fullerene as well
+compute			fb_com b_fulleren com
+variable                fb_x_com equal c_fb_com[1]
+variable                fb_y_com equal c_fb_com[2]
+variable                fb_z_com equal c_fb_com[3]
+fix                     b_com_print all print 20 "${fb_x_com} ${fb_y_com} ${fb_z_com}" file data/b_fullerene_pos.dat screen no
+
 # Make membrane circular
 region                  notDel sphere 150 150 0 150 units box
 group			notDel region notDel
 group			del subtract all notDel
-
-delete_atoms		group del
-
-# That would be a fullerenic crystal
-# create_atoms		0 region sim_space mol C60 123 units box
+# delete_atoms		group del
 
 # Potential settings
 # FIXME *neighbor bin* stopped working for some reason
@@ -44,12 +54,6 @@ neigh_modify    	every 1 delay 0
 # Type of potential?
 pair_style              reax/c NULL 
 pair_coeff              * * ffield.reax.cho C
-#pair_style              hybrid reax/c NULL lj/cut 5.
-
-#pair_coeff              * * reax/c ffield.reax.cho NULL C
-#pair_coeff		1 2 lj/cut  0.010832 3.345 10
-#pair_coeff		1 1 lj/cut  0.010832 1.445 10
-
 
 dump			MyDump all custom 20 pilotwave.lammpstrj element x y z
 dump_modify		MyDump sort id element C 
@@ -63,47 +67,21 @@ fix                     NVE all nve
 # Carbon - carbon potential is here
 fix                     1 all qeq/reax 1 0.0 10.0 1e-6 reax/c 
 
-# Add harmonic response from the graphene
 
-# Stabilize the graphene sheet
-#fix                     controltemp graphene langevin 10.0 10.1 50.0 48279
-
-# Also add initial push to give some momentum to the fulerenes
-# fix                     pushball fulleren addforce 0.2 0.2 0.0
-# fix                     b_pushball b_fulleren addforce -0.2 -0.2 0.0
-
-#run                     1000 
-
-# Turn off gravity
-# unfix                   pushball
-
-# Turn off temperature controll (graphene is stable now)
-#unfix                   controltemp
-
-# Add gravity fixed to the ball
-
-# Add gravity fixed to the second ball
-#fix                     b_gravity b_fulleren addforce 0.0 0.0 2.22 
-
-# See what gives
-
-
-
-# APPLAY PERIODIC FORCE
-
+# Apply gravitish force
 fix                     gravity fulleren addforce 0.0 0.0 0.6
 fix                     b_gravity b_fulleren addforce 0.0 0.0 0.6
 timestep                0.5
-variable		sinForce equal swiggle(0,0.5,1200)
 
+# APPLAY PERIODIC FORCE
+variable		sinForce equal swiggle(0,0.5,1200)
 fix                     4 graphene spring/self 1.0 xyz
 fix                     wavee graphene addforce 0.0 0.0 v_sinForce
 
-
+# Stabilzation period
 fix			vis all viscous 200
-
 run			500
 
+# Full run
 fix			vis all viscous 10
-
-run                     500000
+run                     200000
