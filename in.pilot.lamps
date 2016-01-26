@@ -2,7 +2,7 @@ units                   real
 atom_style              charge
 boundary                f f f
 
-processors		* * 1
+processors		* * *
 region		        sim_space block -8 320 -8 320 -50 50 units box
 create_box	        1 sim_space 
 
@@ -26,19 +26,19 @@ compute			fa_com fulleren com
 variable                fa_x_com equal c_fa_com[1]
 variable                fa_y_com equal c_fa_com[2]
 variable                fa_z_com equal c_fa_com[3]
-fix                     a_com_print all print 20 "${fa_x_com} ${fa_y_com} ${fa_z_com}" file data/a_fullerene_pos.dat screen no
+fix                     a_com_print all print 100 "${fa_x_com} ${fa_y_com} ${fa_z_com}" file data/a_fullerene_pos.dat screen no
 
 # Insert another C60 object
 region                  b_fulleren_space sphere 160 160 -10 5 units box
-create_atoms		0 single 160 160 -10 mol C60 123 units box
+# create_atoms		0 single 160 160 -10 mol C60 123 units box
 group                   b_fulleren region b_fulleren_space
 
 # Get center of mass for the second fullerene as well
-compute			fb_com b_fulleren com
-variable                fb_x_com equal c_fb_com[1]
-variable                fb_y_com equal c_fb_com[2]
-variable                fb_z_com equal c_fb_com[3]
-fix                     b_com_print all print 20 "${fb_x_com} ${fb_y_com} ${fb_z_com}" file data/b_fullerene_pos.dat screen no
+# compute			fb_com b_fulleren com
+# variable                fb_x_com equal c_fb_com[1]
+# variable                fb_y_com equal c_fb_com[2]
+# variable                fb_z_com equal c_fb_com[3]
+# fix                     b_com_print all print 200 "${fb_x_com} ${fb_y_com} ${fb_z_com}" file data/b_fullerene_pos.dat screen no
 
 # Make membrane circular
 region                  notDel sphere 150 150 0 150 units box
@@ -67,14 +67,13 @@ fix                     NVE all nve
 # Carbon - carbon potential is here
 fix                     1 all qeq/reax 1 0.0 10.0 1e-6 reax/c 
 
-
 # Apply gravitish force
 fix                     gravity fulleren addforce 0.0 0.0 0.6
 fix                     b_gravity b_fulleren addforce 0.0 0.0 0.6
 timestep                0.5
 
 # APPLAY PERIODIC FORCE
-variable		sinForce equal swiggle(0,0.5,1200)
+variable		sinForce equal swiggle(0,0.5,1180)
 fix                     4 graphene spring/self 1.0 xyz
 fix                     wavee graphene addforce 0.0 0.0 v_sinForce
 

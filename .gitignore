@@ -1,3 +1,7 @@
 log.*
 
+*.swp
+
+*.dat
+
 *.lammpstrj

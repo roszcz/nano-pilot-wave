@@ -14,3 +14,9 @@ def read_pos(filepath):
 if __name__ == '__main__':
     
     apos = read_pos('data/a_fullerene_pos.dat')
+
+    x = [pos[0] for pos in apos]
+    y = [pos[1] for pos in apos]
+
+    plt.plot(x, y)
+    plt.show()
