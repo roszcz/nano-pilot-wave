@@ -82,5 +82,5 @@ fix			vis all viscous 200
 run			500
 
 # Full run
-fix			vis all viscous 10
-run                     200000
+fix			vis all viscous 30
+run                     500000

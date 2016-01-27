@@ -17,6 +17,9 @@ if __name__ == '__main__':
 
     x = [pos[0] for pos in apos]
     y = [pos[1] for pos in apos]
+    z = [pos[2] for pos in apos]
 
     plt.plot(x, y)
+    plt.show()
+    plt.plot(z)
     plt.show()
