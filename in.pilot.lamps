@@ -18,7 +18,7 @@ mass                    1 12.01
 # Insert C60 object
 molecule		C60 C60.mol
 region                  fulleren_space sphere 150 150 -10 5 units box
-create_atoms		0 single 150 150 -10 mol C60 123 units box
+create_atoms		0 single 150 150 -11 mol C60 123 units box
 group                   fulleren region fulleren_space
 
 # Keep its center of mass
@@ -74,15 +74,13 @@ timestep                0.5
 
 # APPLAY PERIODIC FORCE
 variable		sinForce equal swiggle(0,0.5,1180)
+fix                     4 graphene spring/self 1.0 xyz
 fix                     wavee graphene addforce 0.0 0.0 v_sinForce
-fix                     graphene_spring graphene spring/self 1.0 z
 
 # Stabilzation period
-fix			vis all viscous 400
-run			800
+fix			vis all viscous 300
+run			500
 
-# Allow graphene atoms to move up or down only
-fix			move_vertical graphene setforce 0.0 0.0 NULL
 # Full run
 fix			vis all viscous 30
 run                     500000
