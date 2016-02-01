@@ -1,26 +1,25 @@
 units                   real   
 atom_style              charge
-boundary                f f f
+boundary                p p p
 
-region		        sim_space block -8 161 -8 161 -50 50 units box
-
-# Number of types of atoms allowed in the simulation
+processors		* * *
+region		        sim_space block -8 320 -8 320 -50 50 units box
 create_box	        2 sim_space 
 
+
 # Create graphene sheet
-region                  graphene_space block -5 160 -5 160 -3 3 units box
-read_dump               huge_sheet.what 0 x y z box no add yes
+region                  graphene_space block -5 320 -5 320 -3 3 units box
+read_dump               structures/30nm_30nm_graphene.what 0 x y z box no add yes
 group                   graphene region graphene_space
 
 # Mass of carbon
 mass                    1 12.01
 
 # Add single atom of special type
-region                  single_atom block 79 81 79 81 -10 -1 units box
-create_atoms            2 single 80.8 80.8 -3 units box
-create_atoms            2 single 79.1 79.1 -3 units box
-group                   single_ball region single_atom
-mass                    2 500.1
+create_atoms            2 single 80.8 80.8 -9 units box
+region                  a_single_atom sphere 80 80 -9 2 units box
+group                   a_single_ball region a_single_atom
+mass                    2 1500.1
 
 # Removing atoms for debug agility, remove this TODO
 region			notDel sphere 80 80 0 30 units box
@@ -29,55 +28,49 @@ group			del subtract all notDel
 delete_atoms		group del
 
 # Declare separate potentials for each possible atom type interaction
-pair_style	        hybrid	reax/c	NULL	lj/cut	10
-# Carbon - Carbon
-pair_coeff              * * reax/c ffield.reax.cho C NULL
-# Ball - Carbon
-pair_coeff	        1	2	lj/cut	 0.030832 3.345 10	
+pair_style	        lj/cut	10
+# Sheet - Sheet
+pair_coeff	        1	1	0.00032 3.345 10	
+# Ball - Sheet 
+pair_coeff	        1	2	0.030832 3.345 10	
 # Ball - Ball
-pair_coeff	        2	2	lj/cut	 0.010832 3.345 10	
+pair_coeff	        2	2	0.010832 3.345 10	
 
 # Some numerical neuances
 neighbor        	1.0 bin
 neigh_modify    	every 1 delay 0
 
 # Full data dump
-dump			MyDump all custom 10 pilotwave.lammpstrj element x y z
-dump_modify		MyDump sort id element C 2
-
-# Signle atom dump
-dump                    ball single_ball xyz 10 zball.dat
+dump                    my_dump all atom 100 pilotwaves.lammpstrj
 
 # debug << 
-thermo                  50
+thermo                  100
 
 timestep                0.85
 
 # Obligatory fix
 fix                     NVE all nve
 
-# Charge equalibration WTF
-fix                     reactor all qeq/reax 1 0.0 10.0 1e-6 reax/c 
-
 # Add harmonic response from the graphene
-fix                     springness graphene spring/self 0.003 z
+fix                     springness graphene spring/self 101.3 xyz
 # Is spring needed in the presence of swiggle?
 
-# Stabilize the graphene sheet
-fix                     controltemp graphene langevin 1.0 1.1 200.0 48279
-run                     700 
-
 # Add graphene sheet oscillations (val0, amplitude, period)
-variable                sinForce equal swiggle(15,15,2000)
+variable                sinForce equal swiggle(0,0.5,1100)
 # fix                     wavee graphene addforce 0.0 0.0 v_sinForce
 
+# Allow field to oscillate only in the z-direction
+fix                     test graphene setforce 0.0 0.0 NULL
+
 # Special gravity for special atom
-# fix                     c_gravity single_ball addforce 0.0 0.0 6.20
-fix                     d_gravity single_ball addforce 0.0 0.0 v_sinForce
-# fix                     e_gravity single_ball addforce 0.0 0.0 15.0
+fix                     a_gravity a_single_ball addforce 0.0 0.0 1.0
+
+# Stabilize the graphene sheet
+fix                     vis all viscous 500
+run                     700 
 
 # Add viscousity
-fix			vis all viscous 5
+fix			vis all viscous 300
 
 # See what gives
-run                     30000
+run                     3000
