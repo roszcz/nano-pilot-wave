@@ -35,7 +35,7 @@ pair_coeff      	2 2  0.1939 3.510832  10
 dump                    my_dump all atom 10 pilotwaves.lammpstrj
 
 thermo                  100
-thermo_style		custom step dt temp ke
+thermo_style		custom step temp ke
 
 
 fix                     NVE all nve
@@ -53,11 +53,11 @@ variable		free_atom equal z[34933]
 variable		membrane_atom equal z[34932]
 variable		time_step equal step
 
-fix			fp all print 5 "${time_step} ${free_atom} ${membrane_atom}" file out.dat screen no
+fix			fp all print 5 "${time_step} ${free_atom} ${membrane_atom}" file data/single_ball.dat screen no
 
 velocity		all set 0 0 0 units box
 
-variable		sin_force equal swiggle(0,0.1,1500)
+variable		sin_force equal swiggle(0,0.1,1080)
 fix                     wavee graphene addforce 0.0 0.0 v_sin_force
 fix			vis all viscous 0.002
 run                     20000
