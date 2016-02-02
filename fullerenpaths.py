@@ -25,16 +25,21 @@ def show_fullerene():
     plt.show()
 
 def show_single_ball():
-    """ Better fixed hexagonal structure with heave bouncer """
+    """ Better fixed hexagonal structure with heavy bouncer """
     apos = read_pos('data/single_ball.dat')
 
     t           = [pos[0] for pos in apos]
-    z_ball      = [pos[1] for pos in apos]
-    z_membrane  = [pos[2] for pos in apos]
+    z_membrane  = [pos[1] for pos in apos]
+    x_ball      = [pos[2] for pos in apos]
+    y_ball      = [pos[3] for pos in apos]
+    z_ball      = [pos[4] for pos in apos]
 
     plt.plot(t, z_ball, c='black')
     plt.plot(t, z_membrane, c='green')
     plt.legend(['ball', 'membrane'], loc = 'center right')
+    plt.show()
+
+    plt.plot(x_ball, y_ball)
     plt.show()
 
 if __name__ == '__main__':
