@@ -59,8 +59,8 @@ fix			fp all print 5 "${time_step} ${membrane_atom} ${x_free_atom} ${y_free_atom
 
 velocity		all set 0 0 0 units box
 
-variable		sin_force equal swiggle(0,0.33,1080)
+variable		sin_force equal swiggle(0,0.33,1070)
 fix                     wavee graphene addforce 0.0 0.0 v_sin_force
 fix			vis all viscous 0.002
-run                     20000
+run                     500000
 
