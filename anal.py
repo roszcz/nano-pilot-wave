@@ -4,28 +4,44 @@ import numpy as np
 def read_pos(filepath):
     out = []
     with open(filepath) as fin:
-        for line in fin:
-            vals = line.split()
-            if len(vals) is 4:
-                out.append([float(val) for val in vals])
+	next(fin)
+	for line in fin:
+	    vals = line.split()
+	    out.append([float(val) for val in vals])
+
     return out
 
-if __name__ == "__main__":
+def show_fullerene():
+    """ Show results for fullerene case OBSOLETE """
+    apos = read_pos('data/a_fullerene_pos.dat')
 
-    fpath = 'zball.dat'
-    pos = read_pos(fpath)
-    x = []
-    y = []
-    z = []
-    for val in pos:
-        x.append(val[1] - 80)
-        y.append(val[2] - 80)
-        z.append(val[3])
+    x = [pos[0] for pos in apos]
+    y = [pos[1] for pos in apos]
+    z = [pos[2] for pos in apos]
 
-    plt.plot(x[1::2])
-    plt.plot(y[1::2])
-    plt.plot(z[1::2])
-    plt.plot(x[0::2])
-    plt.plot(z[0::2])
-    plt.legend(['x2', 'y2', 'z2','x1', 'z1'])
+    plt.plot(x, y)
     plt.show()
+    plt.plot(z)
+    plt.show()
+
+def show_single_ball():
+    """ Better fixed hexagonal structure with heavy bouncer """
+    apos = read_pos('data/single_ball.dat')
+
+    t           = [pos[0] for pos in apos]
+    z_membrane  = [pos[1] for pos in apos]
+    x_ball      = [pos[2] for pos in apos]
+    y_ball      = [pos[3] for pos in apos]
+    z_ball      = [pos[4] for pos in apos]
+
+    plt.plot(t, z_ball, c='black')
+    plt.plot(t, z_membrane, c='green')
+    plt.legend(['ball', 'membrane'], loc = 'center right')
+    plt.show()
+
+    plt.plot(x_ball, y_ball)
+    plt.show()
+
+if __name__ == '__main__':
+    """ %run this.file.py """
+    show_single_ball()
