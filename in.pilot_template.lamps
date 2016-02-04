@@ -16,7 +16,7 @@ group                   graphene region graphene_space
 mass                    1 12.01
 mass                    2 392.01
 
-create_atoms		2 single 150 150 -5.0 units box
+create_atoms		2 single 150 150 -6.5 units box
 region                  a_ball_space sphere 150 150 -10 7 units box
 group                   a_ball region a_ball_space
 
@@ -59,8 +59,8 @@ fix			fp all print 5 "${time_step} ${membrane_atom} ${x_free_atom} ${y_free_atom
 
 velocity		all set 0 0 0 units box
 
-variable		sin_force equal swiggle(0,0.33,1070)
+variable		sin_force equal swiggle(0,0.33,${MEMBRANE_FREQUENCY})
 fix                     wavee graphene addforce 0.0 0.0 v_sin_force
 fix			vis all viscous 0.002
-run                     5000
+run                     15000
 
