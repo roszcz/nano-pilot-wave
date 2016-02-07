@@ -42,7 +42,7 @@ fix                     NVE all nve
 
 # Apply gravitish force
 fix                     gravity a_ball addforce 0.0 0.0 ${GRAVITY}
-timestep		5
+timestep		6
 
 fix                     graphene_spring graphene spring/self 0.5 z
 

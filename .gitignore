@@ -9,3 +9,5 @@ log.*
 *.mp4
 
 *RUNME*
+
+*.pickle
