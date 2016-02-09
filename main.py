@@ -11,45 +11,37 @@ class LampsRunner(object):
     """ Convenience class for running lammps fro python """
     def __init__(self):
 	""" Co robi traktor u fryzjera? Warkocze """
-	self.gravity = '8.5'
-	self.membrane_frequency = '1100'
+	self.gravity_marker	 = 'GRAVITY'
+	self.gravity             = '8.5'
+	self.frequency_marker    = 'MEMBRANE_FREQUENCY'
+	self.membrane_frequency  = '1100'
+        self.amp_marker          = 'AMPLITUDE'
+        self.amplitude           = '0.33'
+
+    def set_amplitude(self, amp):
+        """ futro odrosnie jutro """
+        self.amplitude = str(amp)
 
     def set_gravity(self, grav):
-	""" set me """
+	""" kontempluj przejaw tao """
 	self.gravity = str(grav)
 
     def set_membrane_frequency(self, freq):
 	""" set me """
 	self.membrane_frequency = str(freq)
 
-    def make_file(self):
-	""" Adjust this with the template file and changable parameters """
-	# Prepare markers 
-	gravity_marker	    = '${GRAVITY}'
-	frequency_marker    = '${MEMBRANE_FREQUENCY}'
-
-	# Mystic file operations
-	with open(final_file, 'wt') as fout:
-            with open(template_file, 'rt') as fin:
-		for line in fin:
-                    # Set gravity
-                    newline = line.replace(gravity_marker,\
-                                           self.gravity)
-                    # Set frequency
-                    newline = newline.replace(frequency_marker,\
-                                              self.membrane_frequency)
-                    fout.write(newline)
-
     def run_it(self):
 	""" Runs lammps """
-	self.make_file()
 	processess = str(8)
 
 	commands = ['mpirun', '-np', processess,
                     'lammps-daily',
                     '-sf', 'omp',
                     '-pk', 'omp', processess,
-                    '-in', final_file]
+                    '-var', self.amp_marker, self.amplitude,
+                    '-var', self.gravity_marker, self.gravity,
+                    '-var', self.frequency_marker, self.membrane_frequency,
+                    '-in', template_file]
 
 	call(commands, stdout=open(os.devnull, 'wb'))
 
@@ -58,8 +50,9 @@ if __name__ == '__main__':
 
     runner = LampsRunner()
 
-    gravities   = [7 + 0.1 * it for it in range(7)]
-    frequencies = [1010 + 5 * it for it in range(7)]
+    gravities   = [8.2 + 0.1 * it for it in range(7)]
+    frequencies = [1075]
+    amplitudes  = [0.25 + 0.05 * it for it in range(20)]
 
     score_file  = 'data/single_ball.dat'
 
@@ -69,25 +62,28 @@ if __name__ == '__main__':
 
     for gravity in gravities:
 	for freq in frequencies:
-            runner.set_membrane_frequency(freq)
-            runner.set_gravity(gravity)
+            for amp in amplitudes:
+                runner.set_membrane_frequency(freq)
+                runner.set_gravity(gravity)
+                runner.set_amplitude(amp)
 
-            print "Gravity:", gravity
-            print "Frequency:", freq
+                print "Gravity:", gravity
+                print "Frequency:", freq
+                print "Amplitude:", amp
 
-            runner.run_it()
+                runner.run_it()
 
-            score = anal.read_pos(score_file)
+                score = anal.read_pos(score_file)
 
-            balls_z.append([pos[4] for pos in score])
-            membranes_z.append([pos[1] for pos in score])
+                balls_z.append([pos[4] for pos in score])
+                membranes_z.append([pos[1] for pos in score])
 
-            # Re-Save every step
-            with open('data/ballsz.pickle', 'wb') as handle:
-                pickle.dump(balls_z, handle)
+                # Re-Save every step
+                with open('data/ballsz.pickle', 'wb') as handle:
+                    pickle.dump(balls_z, handle)
 
-            with open('data/membranesz.pickle', 'wb') as handle:
-                pickle.dump(membranes_z, handle)
+                with open('data/membranesz.pickle', 'wb') as handle:
+                    pickle.dump(membranes_z, handle)
 
     # plt.imshow(balls_z, aspect='auto')
     # plt.show()
