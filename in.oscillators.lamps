@@ -1,0 +1,43 @@
+units                   real   
+atom_modify		sort 1 1  map array
+atom_style              charge
+boundary                f f f
+
+processors		* * *
+region		        sim_space block -2 2 -2 2 -50 50 units box
+create_box	        1 sim_space 
+
+mass                    1 12.01
+
+create_atoms		1 single 0 0 ${A_BALL_HEIGHT} units box
+region                  a_ball_space sphere 0 0 0 1 units box
+group                   a_ball region a_ball_space
+
+neighbor        	1.0 bin
+neigh_modify    	every 1 delay 0
+
+pair_style		lj/cut 10.
+
+pair_coeff      	1 1  5.5939 1.26  10
+
+dump                    my_dump all atom 10 oscillations.lammpstrj
+
+thermo                  100
+thermo_style		custom step temp ke
+
+fix                     NVE all nve
+
+fix                     gravity a_ball addforce 0.0 0.0 ${GRAVITY}
+fix                     ball_sprint a_ball spring/self ${SPRING_CONSTANT} z
+timestep		6
+
+variable		sin_force equal swiggle(0,${AMPLITUDE},${MEMBRANE_FREQUENCY})
+fix                     wavee a_ball addforce 0.0 0.0 v_sin_force
+fix			vis all viscous 2
+
+variable		membrane_atom equal z[1]
+variable		time_step equal step
+
+fix			fp all print 5 "${time_step} ${membrane_atom}" file data/oscillations.dat screen no
+
+run                     50000

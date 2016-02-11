@@ -5,6 +5,7 @@ import anal
 import pickle
 
 template_file   = 'in.pilot_template.lamps'
+oscillator_file = 'in.oscillators.lamps'
 final_file      = 'in.RUNME.lamps'
 
 class LampsRunner(object):
@@ -17,6 +18,18 @@ class LampsRunner(object):
 	self.membrane_frequency  = '1100'
         self.amp_marker          = 'AMPLITUDE'
         self.amplitude           = '0.33'
+        self.a_ball_z_marker     = 'A_BALL_HEIGHT'
+        self.a_ball_z            = '-6.2'
+        self.spring_marker       = 'SPRING_CONSTANT'
+        self.spring_factor       = '0.5'
+
+    def set_spring_constant(self, k):
+        """ wtf units """
+        self.spring_factor = str(k)
+
+    def set_a_ball_height(self, angstroms):
+        """ how high """
+        self.a_ball_z = str(angstroms)
 
     def set_amplitude(self, amp):
         """ futro odrosnie jutro """
@@ -30,7 +43,7 @@ class LampsRunner(object):
 	""" set me """
 	self.membrane_frequency = str(freq)
 
-    def run_it(self):
+    def run_it(self, filepath):
 	""" Runs lammps """
 	processess = str(8)
 
@@ -40,21 +53,37 @@ class LampsRunner(object):
                     '-pk', 'omp', processess,
                     '-var', self.amp_marker, self.amplitude,
                     '-var', self.gravity_marker, self.gravity,
+                    '-var', self.spring_marker, self.spring_factor,
+                    '-var', self.a_ball_z_marker, self.a_ball_z,
                     '-var', self.frequency_marker, self.membrane_frequency,
-                    '-in', template_file]
+                    '-in', filepath]
+	commands2= ['lammps-daily',
+                    '-var', self.amp_marker, self.amplitude,
+                    '-var', self.gravity_marker, self.gravity,
+                    '-var', self.spring_marker, self.spring_factor,
+                    '-var', self.a_ball_z_marker, self.a_ball_z,
+                    '-var', self.frequency_marker, self.membrane_frequency,
+                    '-in', filepath]
 
-	call(commands, stdout=open(os.devnull, 'wb'))
+	# call(commands, stdout=open(os.devnull, 'wb'))
+	call(commands2)
 
 if __name__ == '__main__':
     """ Run lammps multiple times with python main.py """
 
     runner = LampsRunner()
 
-    gravities   = [8.2 + 0.1 * it for it in range(7)]
-    frequencies = [1075]
-    amplitudes  = [0.25 + 0.05 * it for it in range(20)]
+    gravities       = [0.0]
+    frequencies     = [1000]
+    amplitudes      = [0.33]
+    a_ball_zs       = [0.0]
+    # spring_factors  = [0.5 + 0.5 * it for it in range(1,20)]
+    # spring_factors  = [1.1 + 0.005 * it for it in range(5)]
+    spring_factors  = [1.1 + 0.02]
 
-    score_file  = 'data/single_ball.dat'
+
+    # score_file  = 'data/single_ball.dat'
+    score_file  = 'data/oscillations.dat'
 
     # Prepare score containers
     balls_z     = []
@@ -63,27 +92,34 @@ if __name__ == '__main__':
     for gravity in gravities:
 	for freq in frequencies:
             for amp in amplitudes:
-                runner.set_membrane_frequency(freq)
-                runner.set_gravity(gravity)
-                runner.set_amplitude(amp)
+                for height in a_ball_zs:
+                    for kz in spring_factors:
+                        runner.set_membrane_frequency(freq)
+                        runner.set_gravity(gravity)
+                        runner.set_amplitude(amp)
+                        runner.set_a_ball_height(height)
+                        runner.set_spring_constant(kz)
 
-                print "Gravity:", gravity
-                print "Frequency:", freq
-                print "Amplitude:", amp
+                        print "Gravity:", gravity
+                        print "Frequency:", freq
+                        print "Amplitude:", amp
+                        print "Ball wysokosc:", height
+                        print "Spring constant:", kz
 
-                runner.run_it()
+                        runner.run_it(oscillator_file)
 
-                score = anal.read_pos(score_file)
+                        score = anal.read_pos(score_file)
 
-                balls_z.append([pos[4] for pos in score])
-                membranes_z.append([pos[1] for pos in score])
+                        # For oscillations related reaserch we only have one position in that file
+                        # balls_z.append([pos[4] for pos in score])
+                        membranes_z.append([pos[1] for pos in score])
 
-                # Re-Save every step
-                with open('data/ballsz.pickle', 'wb') as handle:
-                    pickle.dump(balls_z, handle)
+                        # Re-Save every step
+                        with open('data/ballsz.pickle', 'wb') as handle:
+                            pickle.dump(balls_z, handle)
 
-                with open('data/membranesz.pickle', 'wb') as handle:
-                    pickle.dump(membranes_z, handle)
+                        with open('data/membranesz.pickle', 'wb') as handle:
+                            pickle.dump(membranes_z, handle)
 
     # plt.imshow(balls_z, aspect='auto')
     # plt.show()

@@ -19,6 +19,8 @@ mass                    2 392.01
 create_atoms		2 single 150 150 -5.0 units box
 region                  a_ball_space sphere 150 150 -10 7 units box
 group                   a_ball region a_ball_space
+# This is temporary
+delete_atomos		a_ball_space
 
 # Potential settings
 neighbor        	1.0 bin
