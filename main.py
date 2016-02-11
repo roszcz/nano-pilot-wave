@@ -73,17 +73,17 @@ if __name__ == '__main__':
 
     runner = LampsRunner()
 
-    gravities       = [0.0]
+    gravities       = [15.0]
     frequencies     = [1000]
-    amplitudes      = [0.33]
-    a_ball_zs       = [0.0]
+    amplitudes      = [0.03]
+    a_ball_zs       = [-40.0]
     # spring_factors  = [0.5 + 0.5 * it for it in range(1,20)]
     # spring_factors  = [1.1 + 0.005 * it for it in range(5)]
     spring_factors  = [1.1 + 0.02]
 
 
-    # score_file  = 'data/single_ball.dat'
-    score_file  = 'data/oscillations.dat'
+    score_file  = 'data/single_ball.dat'
+    # score_file  = 'data/oscillations.dat'
 
     # Prepare score containers
     balls_z     = []
@@ -106,12 +106,12 @@ if __name__ == '__main__':
                         print "Ball wysokosc:", height
                         print "Spring constant:", kz
 
-                        runner.run_it(oscillator_file)
+                        runner.run_it(template_file)
 
                         score = anal.read_pos(score_file)
 
                         # For oscillations related reaserch we only have one position in that file
-                        # balls_z.append([pos[4] for pos in score])
+                        balls_z.append([pos[4] for pos in score])
                         membranes_z.append([pos[1] for pos in score])
 
                         # Re-Save every step

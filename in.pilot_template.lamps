@@ -42,8 +42,6 @@ thermo_style		custom step temp ke
 
 fix                     NVE all nve
 
-# Apply gravitish force
-fix                     gravity a_ball addforce 0.0 0.0 ${GRAVITY}
 timestep		6
 
 fix                     graphene_spring graphene spring/self ${SPRING_CONSTANT} z
@@ -64,6 +62,13 @@ velocity		all set 0 0 0 units box
 # Force needs to be cosinuoidal
 variable		sin_force equal swiggle(0,${AMPLITUDE},${MEMBRANE_FREQUENCY})
 fix                     wavee graphene addforce 0.0 0.0 v_sin_force
-fix			vis all viscous 0.002
-run                     2500
+fix			vis all viscous 2
+
+# Reach oscillatory stability
+run                     5000
+
+# Drop the ball
+fix                     gravity a_ball addforce 0.0 0.0 ${GRAVITY}
+
+run			50000
 
