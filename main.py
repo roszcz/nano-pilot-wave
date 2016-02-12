@@ -73,10 +73,10 @@ if __name__ == '__main__':
 
     runner = LampsRunner()
 
-    gravities       = [15.0]
+    gravities       = [13.0]
     frequencies     = [1000]
-    amplitudes      = [0.03]
-    a_ball_zs       = [-40.0]
+    amplitudes      = [0.05]
+    a_ball_zs       = [-30.0]
     # spring_factors  = [0.5 + 0.5 * it for it in range(1,20)]
     # spring_factors  = [1.1 + 0.005 * it for it in range(5)]
     spring_factors  = [1.1 + 0.02]
