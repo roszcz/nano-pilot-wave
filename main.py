@@ -57,6 +57,8 @@ class LampsRunner(object):
                     '-var', self.a_ball_z_marker, self.a_ball_z,
                     '-var', self.frequency_marker, self.membrane_frequency,
                     '-in', filepath]
+
+        # FIXME wtf why is this faster
 	commands2= ['lammps-daily',
                     '-var', self.amp_marker, self.amplitude,
                     '-var', self.gravity_marker, self.gravity,
@@ -65,21 +67,21 @@ class LampsRunner(object):
                     '-var', self.frequency_marker, self.membrane_frequency,
                     '-in', filepath]
 
-	# call(commands, stdout=open(os.devnull, 'wb'))
-	call(commands2)
+	call(commands, stdout=open(os.devnull, 'wb'))
+	# call(commands2)
 
 if __name__ == '__main__':
     """ Run lammps multiple times with python main.py """
 
     runner = LampsRunner()
 
-    gravities       = [13.0]
+    gravities       = [6 + it for it in range(5)]
     frequencies     = [1000]
     amplitudes      = [0.05]
-    a_ball_zs       = [-30.0]
+    a_ball_zs       = [-5 - it for it in range(6)]
     # spring_factors  = [0.5 + 0.5 * it for it in range(1,20)]
     # spring_factors  = [1.1 + 0.005 * it for it in range(5)]
-    spring_factors  = [1.1 + 0.02]
+    spring_factors  = [1.12]
 
 
     score_file  = 'data/single_ball.dat'
