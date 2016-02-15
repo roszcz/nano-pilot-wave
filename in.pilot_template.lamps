@@ -14,7 +14,7 @@ read_dump               structures/30nm_30nm_graphene.what 0 x y z box no add ye
 group                   graphene region graphene_space
 
 mass                    1 12.01
-mass                    2 392.01
+mass                    2 ${A_BALL_MASS}
 
 create_atoms		2 single 150 150 ${A_BALL_HEIGHT} units box
 region                  a_ball_space sphere 150 150 ${A_BALL_HEIGHT} 7 units box
@@ -70,5 +70,5 @@ run                     5000
 # Drop the ball
 fix                     gravity a_ball addforce 0.0 0.0 ${GRAVITY}
 
-run			50000
+run			20000
 
