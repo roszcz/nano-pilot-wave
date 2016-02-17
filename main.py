@@ -131,7 +131,7 @@ if __name__ == '__main__':
                             print "Ball's mass:", mass
 
                             runner.set_number_of_iterations(500000)
-                            runner.set_number_of_cores(6)
+                            runner.set_number_of_cores(4)
                             runner.run_it(template_file)
 
                             score = anal.read_pos(score_file)
