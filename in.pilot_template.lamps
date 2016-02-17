@@ -70,5 +70,5 @@ run                     5000
 # Drop the ball
 fix                     gravity a_ball addforce 0.0 0.0 ${GRAVITY}
 
-run			20000
+run			${ITERATIONS}
 

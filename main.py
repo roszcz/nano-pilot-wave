@@ -24,6 +24,17 @@ class LampsRunner(object):
         self.spring_factor       = '0.5'
         self.a_mass_marker       = 'A_BALL_MASS'
         self.a_mass              = '392.01'
+        self.iterations_marker   = 'ITERATIONS'
+        self.iterations          = '20000'
+        self.processes           = '8'
+
+    def set_number_of_cores(self, howmany):
+        """ how """
+        self.processes = str(howmany)
+
+    def set_number_of_iterations(self, howmany):
+        """ how long """
+        self.iterations = str(howmany)
 
     def set_spring_constant(self, k):
         """ wtf units """
@@ -51,18 +62,17 @@ class LampsRunner(object):
 
     def run_it(self, filepath):
 	""" Runs lammps """
-	processess = str(8)
-
-	commands = ['mpirun', '-np', processess,
+	commands = ['mpirun', '-np', self.processes,
                     'lammps-daily',
                     '-sf', 'omp',
-                    '-pk', 'omp', processess,
+                    '-pk', 'omp', self.processes,
                     '-var', self.amp_marker, self.amplitude,
                     '-var', self.gravity_marker, self.gravity,
                     '-var', self.spring_marker, self.spring_factor,
                     '-var', self.a_ball_z_marker, self.a_ball_z,
                     '-var', self.frequency_marker, self.membrane_frequency,
                     '-var', self.a_mass_marker, self.a_mass,
+                    '-var', self.iterations_marker, self.iterations,
                     '-in', filepath]
 
         # FIXME wtf why is this faster
@@ -73,10 +83,11 @@ class LampsRunner(object):
                     '-var', self.a_ball_z_marker, self.a_ball_z,
                     '-var', self.frequency_marker, self.membrane_frequency,
                     '-var', self.a_mass_marker, self.a_mass,
+                    '-var', self.iterations_marker, self.iterations,
                     '-in', filepath]
 
-	call(commands2, stdout=open(os.devnull, 'wb'))
-	# call(commands2)
+	# call(commands2, stdout=open(os.devnull, 'wb'))
+	call(commands)
 
 if __name__ == '__main__':
     """ Run lammps multiple times with python main.py """
@@ -88,7 +99,7 @@ if __name__ == '__main__':
     amplitudes      = [0.05]
     a_ball_zs       = [-9]
     # 102.01 and 112.01 gave great results
-    a_ball_mass     = [95.01 + 0.5 * it for it in range(30)]
+    a_ball_mass     = [102.51]
     spring_factors  = [1.12]
 
 
@@ -119,6 +130,8 @@ if __name__ == '__main__':
                             print "Spring constant:", kz
                             print "Ball's mass:", mass
 
+                            runner.set_number_of_iterations(500000)
+                            runner.set_number_of_cores(6)
                             runner.run_it(template_file)
 
                             score = anal.read_pos(score_file)
