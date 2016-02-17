@@ -87,7 +87,8 @@ if __name__ == '__main__':
     frequencies     = [1000]
     amplitudes      = [0.05]
     a_ball_zs       = [-9]
-    a_ball_mass     = [292.01 - 10 * it for it in range(20)]
+    # 102.01 and 112.01 gave great results
+    a_ball_mass     = [95.01 + 0.5 * it for it in range(30)]
     spring_factors  = [1.12]
 
 
