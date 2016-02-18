@@ -87,7 +87,7 @@ class LampsRunner(object):
                     '-in', filepath]
 
 	# call(commands2, stdout=open(os.devnull, 'wb'))
-	call(commands)
+	call(commands2)
 
 if __name__ == '__main__':
     """ Run lammps multiple times with python main.py """
@@ -130,7 +130,7 @@ if __name__ == '__main__':
                             print "Spring constant:", kz
                             print "Ball's mass:", mass
 
-                            runner.set_number_of_iterations(500000)
+                            runner.set_number_of_iterations(50000000)
                             runner.set_number_of_cores(4)
                             runner.run_it(template_file)
 
