@@ -20,7 +20,12 @@ create_atoms		2 single 150 150 ${A_BALL_HEIGHT} units box
 region                  a_ball_space sphere 150 150 ${A_BALL_HEIGHT} 7 units box
 group                   a_ball region a_ball_space
 # This is temporary
-# delete_atoms		group a_ball
+
+# Removing atoms for debug agility, remove this TODO
+region			notDel sphere 150 150 0 60 units box
+group			notDel region notDel
+group			del subtract all notDel
+delete_atoms		group del
 
 # Potential settings
 neighbor        	1.0 bin
@@ -34,9 +39,9 @@ pair_coeff      	2 2  0.1939 3.510832  10
 
 
 # Full data dump
-dump                    my_dump all atom 10 pilotwaves.lammpstrj
+dump                    my_dump all atom 160 pilotwaves.lammpstrj
 
-thermo                  100
+thermo                  500
 thermo_style		custom step temp ke
 
 
@@ -49,13 +54,13 @@ fix                     graphene_spring graphene spring/self ${SPRING_CONSTANT} 
 # Allow graphene atoms to move up or down only
 fix			move_vertical graphene setforce 0.0 0.0 NULL
 
-variable		x_free_atom equal x[34933]
-variable		y_free_atom equal y[34933]
-variable		z_free_atom equal z[34933]
-variable		membrane_atom equal z[34932]
+variable		x_free_atom equal x[1]
+variable		y_free_atom equal y[1]
+variable		z_free_atom equal z[1]
+variable		membrane_atom equal z[4323]
 variable		time_step equal step
 
-fix			fp all print 5 "${time_step} ${membrane_atom} ${x_free_atom} ${y_free_atom} ${z_free_atom}" file data/single_ball.dat screen no
+fix			fp all print 160 "${time_step} ${membrane_atom} ${x_free_atom} ${y_free_atom} ${z_free_atom}" file data/single_ball.dat screen no
 
 velocity		all set 0 0 0 units box
 
