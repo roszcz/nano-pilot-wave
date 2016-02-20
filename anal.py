@@ -1,6 +1,26 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+def make_position_histogram(filepath):
+    """ Choosing proper number of bins is important, apparently"""
+    # Read the full path from 'data/single_ball.dat'
+    scores = read_pos(filepath)
+    xx = [pos[2] for pos in scores]
+    yy = [pos[3] for pos in scores]
+
+    # Number of bins is defined here by the suqare of number of measurements
+    xedges = np.linspace(min(xx), max(xx), np.sqrt(len(xx)))
+    yedges = xedges
+
+    # 
+    H, xedges, yedges = np.histogram2d(xx, yy, bins=(xedges, yedges))
+
+    # Scale the colors with vmax
+    im = plt.imshow(H, vmin=0, vmax=10*H.mean(),\
+				interpolation='nearest',
+				origin='low',
+				extent=[xedges[0], xedges[-1], yedges[0], yedges[-1]])
+
 def read_pos(filepath):
     out = []
     with open(filepath) as fin:

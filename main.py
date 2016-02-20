@@ -26,11 +26,18 @@ class LampsRunner(object):
         self.a_mass              = '392.01'
         self.iterations_marker   = 'ITERATIONS'
         self.iterations          = '20000'
+        self.sheet_radius_m      = 'SHEET_RADIUS'
+        self.sheet_radius        = '88'
+
         self.processes           = '8'
 
     def set_number_of_cores(self, howmany):
         """ how """
         self.processes = str(howmany)
+
+    def set_sheet_radius(self, nm):
+        """ this is necessary """
+        self.sheet_radius = str(nm)
 
     def set_number_of_iterations(self, howmany):
         """ how long """
@@ -72,6 +79,7 @@ class LampsRunner(object):
                     '-var', self.a_ball_z_marker, self.a_ball_z,
                     '-var', self.frequency_marker, self.membrane_frequency,
                     '-var', self.a_mass_marker, self.a_mass,
+                    '-var', self.sheet_radius_m, self.sheet_radius,,
                     '-var', self.iterations_marker, self.iterations,
                     '-in', filepath]
 
@@ -83,6 +91,7 @@ class LampsRunner(object):
                     '-var', self.a_ball_z_marker, self.a_ball_z,
                     '-var', self.frequency_marker, self.membrane_frequency,
                     '-var', self.a_mass_marker, self.a_mass,
+                    '-var', self.sheet_radius_m, self.sheet_radius,,
                     '-var', self.iterations_marker, self.iterations,
                     '-in', filepath]
 
@@ -101,6 +110,7 @@ if __name__ == '__main__':
     # 102.01 and 112.01 gave great results
     a_ball_mass     = [102.51]
     spring_factors  = [1.12]
+    sheet_radius    = 90
 
 
     score_file  = 'data/single_ball.dat'
@@ -129,6 +139,9 @@ if __name__ == '__main__':
                             print "Ball wysokosc:", height
                             print "Spring constant:", kz
                             print "Ball's mass:", mass
+
+                            runner.set_sheet_radius(sheet_radius)
+                            print "Radius of sheet:", sheet_radius
 
                             runner.set_number_of_iterations(50000000)
                             runner.set_number_of_cores(4)
