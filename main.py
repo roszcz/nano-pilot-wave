@@ -79,7 +79,7 @@ class LampsRunner(object):
                     '-var', self.a_ball_z_marker, self.a_ball_z,
                     '-var', self.frequency_marker, self.membrane_frequency,
                     '-var', self.a_mass_marker, self.a_mass,
-                    '-var', self.sheet_radius_m, self.sheet_radius,,
+                    '-var', self.sheet_radius_m, self.sheet_radius,
                     '-var', self.iterations_marker, self.iterations,
                     '-in', filepath]
 
@@ -91,7 +91,7 @@ class LampsRunner(object):
                     '-var', self.a_ball_z_marker, self.a_ball_z,
                     '-var', self.frequency_marker, self.membrane_frequency,
                     '-var', self.a_mass_marker, self.a_mass,
-                    '-var', self.sheet_radius_m, self.sheet_radius,,
+                    '-var', self.sheet_radius_m, self.sheet_radius,
                     '-var', self.iterations_marker, self.iterations,
                     '-in', filepath]
 
