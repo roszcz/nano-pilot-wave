@@ -22,7 +22,7 @@ group                   a_ball region a_ball_space
 # This is temporary
 
 # Removing atoms for debug agility, remove this TODO
-region			notDel sphere 150 150 0 60 units box
+region			notDel sphere 150 150 0 ${SHEET_RADIUS} units box
 group			notDel region notDel
 group			del subtract all notDel
 delete_atoms		group del
