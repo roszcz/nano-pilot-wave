@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-def make_position_histogram(filepath):
+def make_position_histogram(filepath, cmap='bone'):
     """ Choosing proper number of bins is important, apparently"""
     # Read the full path from 'data/single_ball.dat'
     scores = read_pos(filepath)
@@ -19,7 +19,9 @@ def make_position_histogram(filepath):
     im = plt.imshow(H, vmin=0, vmax=10*H.mean(),\
 				interpolation='nearest',
 				origin='low',
+				cmap=plt.get_cmap(cmap),
 				extent=[xedges[0], xedges[-1], yedges[0], yedges[-1]])
+    plt.show()
 
 def read_pos(filepath):
     out = []
