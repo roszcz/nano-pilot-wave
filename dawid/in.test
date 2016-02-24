@@ -1,0 +1,47 @@
+units                   real
+atom_modify		sort 1 1  map array
+atom_style              bond
+boundary                f f f
+processors              * * 1
+
+bond_style 		harmonic
+
+read_data		membrane.dat
+
+create_atoms		3 single 0 0 10 units box
+create_atoms		3 single -10 11 10 units box
+
+bond_coeff		1 2 1
+bond_coeff		2 .8 10
+
+neighbor        	1.0 bin
+neigh_modify    	every 1 delay 0
+
+fix                     NVE all nve
+
+timestep		10
+thermo			100
+
+
+pair_style		lj/cut 10.
+
+pair_coeff      	* * 0 1  1
+pair_coeff      	1 3  0.0000001139 20.510832  10
+
+
+
+#region			r_inner_cyl cylinder z 0 0 10 -20 -5
+#group			g_inner_cyl region r_inner_cyl
+group			g_inner_cyl type 2
+
+group			g_bouncer type 3
+
+fix                     gravity g_bouncer addforce 0.0 0.0 -2.6
+
+fix			wiggle g_inner_cyl move wiggle 0.0 0.0 0.3 1900 units box
+
+
+dump			MyDump all custom 20 argonW.lammpstrj element x y z
+dump_modify		MyDump sort id element C H Ag
+
+run 			30000
