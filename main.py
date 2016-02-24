@@ -6,7 +6,6 @@ import pickle
 
 template_file   = 'in.pilot_template.lamps'
 oscillator_file = 'in.oscillators.lamps'
-final_file      = 'in.RUNME.lamps'
 
 class LampsRunner(object):
     """ Convenience class for running lammps fro python """
@@ -84,6 +83,7 @@ class LampsRunner(object):
                     '-in', filepath]
 
         # FIXME wtf why is this faster
+        # FIXME no-go on windows
 	commands2= ['lammps-daily',
                     '-var', self.amp_marker, self.amplitude,
                     '-var', self.gravity_marker, self.gravity,
