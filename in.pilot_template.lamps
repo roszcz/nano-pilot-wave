@@ -1,3 +1,5 @@
+# Units and simulation box
+# {{{
 units                   real   
 atom_modify		sort 1 1  map array
 atom_style              charge
@@ -6,29 +8,38 @@ boundary                f f f
 processors		* * 1
 region		        sim_space block -8 320 -8 320 -50 50 units box
 create_box	        2 sim_space 
-
+# }}}
 
 # Create graphene sheet
+# {{{
 region                  graphene_space block -5 320 -5 320 -3 3 units box
 read_dump               structures/30nm_30nm_graphene.what 0 x y z box no add yes
 group                   graphene region graphene_space
+# }}}
 
-# Membrane is 1, ball is 2
+# Declare masses
+# membrane is 1, ball is 2 {{{
 mass                    1 12.01
 mass                    2 ${A_BALL_MASS}
+# }}}
 
 # Create ball
+# {{{
 create_atoms		2 single 150 150 ${A_BALL_HEIGHT} units box
 region                  a_ball_space sphere 150 150 ${A_BALL_HEIGHT} 7 units box
 group                   a_ball region a_ball_space
+# }}}
 
-# Reshape the grapheneish membrane
+# Reshape the grapheneish membrane 
+# {{{
 region			notDel sphere 150 150 0 ${SHEET_RADIUS} units box
 group			notDel region notDel
 group			del subtract all notDel
 delete_atoms		group del
+# }}}
 
 # Potential settings
+# {{{
 neighbor        	1.0 bin
 neigh_modify    	every 1 delay 0
 
@@ -37,47 +48,50 @@ pair_style		lj/cut 10.
 pair_coeff      	1 1  5.5939 1.26  10
 pair_coeff      	1 2  0.0000001139 19.510832  10
 pair_coeff      	2 2  0.1939 3.510832  10
-
+# }}}
 
 # Full data dump
+# {{{
 dump                    my_dump all atom 160 pilotwaves.lammpstrj
-
 thermo                  500
 thermo_style		custom step temp ke
+# }}}
 
-
+# Setup timestep and NVE
+# {{{
 fix                     NVE all nve
-
 timestep		6
+# }}}
 
-# Every point of the membrane is a forced oscillator
+# Wacing sheet 
+# Every point of the membrane is a forced oscillator {{{
 fix                     graphene_spring graphene spring/self ${SPRING_CONSTANT} z
 # With sinusoidal driving force
 variable		sin_force equal swiggle(0,${AMPLITUDE},${MEMBRANE_FREQUENCY})
 fix                     wavee graphene addforce 0.0 0.0 v_sin_force
-
 # Allow graphene atoms to move up or down only
 fix			move_vertical graphene setforce 0.0 0.0 NULL
+# }}}
 
 # Write some coordinates to a seperate file
+# {{{
 variable		x_free_atom equal x[1]
 variable		y_free_atom equal y[1]
 variable		z_free_atom equal z[1]
 variable		membrane_atom equal z[4323]
 variable		time_step equal step
 fix			fp all print 160 "${time_step} ${membrane_atom} ${x_free_atom} ${y_free_atom} ${z_free_atom}" file data/single_ball.dat screen no
+# }}}
 
-# Start standing still
+# Reach oscillatory stability 
+# Start standing still {{{
 velocity		all set 0 0 0 units box
-
 # Prevent energy accumulation
 fix			vis all viscous 2
-
-# Reach oscillatory stability
 run                     5000
+# }}}
 
 # Drop the ball
 fix                     gravity a_ball addforce 0.0 0.0 ${GRAVITY}
 
 run			${ITERATIONS}
-
