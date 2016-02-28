@@ -70,8 +70,8 @@ class LampsRunner(object):
 	""" Runs lammps """
 	commands = ['mpirun', '-np', self.processes,
                     'lammps-daily',
-                    '-sf', 'omp',
-                    '-pk', 'omp', self.processes,
+                    # '-sf', 'omp',
+                    # '-pk', 'omp', self.processes,
                     '-var', self.amp_marker, self.amplitude,
                     '-var', self.gravity_marker, self.gravity,
                     '-var', self.spring_marker, self.spring_factor,
@@ -96,7 +96,7 @@ class LampsRunner(object):
                     '-in', filepath]
 
 	# call(commands2, stdout=open(os.devnull, 'wb'))
-	call(commands2)
+	call(commands)
 
 if __name__ == '__main__':
     """ Run lammps multiple times with python main.py """
@@ -143,7 +143,7 @@ if __name__ == '__main__':
                             runner.set_sheet_radius(sheet_radius)
                             print "Radius of sheet:", sheet_radius
 
-                            runner.set_number_of_iterations(50000000)
+                            runner.set_number_of_iterations(5000)
                             runner.set_number_of_cores(4)
                             runner.run_it(template_file)
 

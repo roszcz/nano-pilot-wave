@@ -13,15 +13,16 @@ region                  graphene_space block -5 320 -5 320 -3 3 units box
 read_dump               structures/30nm_30nm_graphene.what 0 x y z box no add yes
 group                   graphene region graphene_space
 
+# Membrane is 1, ball is 2
 mass                    1 12.01
 mass                    2 ${A_BALL_MASS}
 
+# Create ball
 create_atoms		2 single 150 150 ${A_BALL_HEIGHT} units box
 region                  a_ball_space sphere 150 150 ${A_BALL_HEIGHT} 7 units box
 group                   a_ball region a_ball_space
-# This is temporary
 
-# Removing atoms for debug agility, remove this TODO
+# Reshape the grapheneish membrane
 region			notDel sphere 150 150 0 ${SHEET_RADIUS} units box
 group			notDel region notDel
 group			del subtract all notDel
@@ -49,24 +50,27 @@ fix                     NVE all nve
 
 timestep		6
 
+# Every point of the membrane is a forced oscillator
 fix                     graphene_spring graphene spring/self ${SPRING_CONSTANT} z
+# With sinusoidal driving force
+variable		sin_force equal swiggle(0,${AMPLITUDE},${MEMBRANE_FREQUENCY})
+fix                     wavee graphene addforce 0.0 0.0 v_sin_force
 
 # Allow graphene atoms to move up or down only
 fix			move_vertical graphene setforce 0.0 0.0 NULL
 
+# Write some coordinates to a seperate file
 variable		x_free_atom equal x[1]
 variable		y_free_atom equal y[1]
 variable		z_free_atom equal z[1]
 variable		membrane_atom equal z[4323]
 variable		time_step equal step
-
 fix			fp all print 160 "${time_step} ${membrane_atom} ${x_free_atom} ${y_free_atom} ${z_free_atom}" file data/single_ball.dat screen no
 
+# Start standing still
 velocity		all set 0 0 0 units box
 
-# Force needs to be cosinuoidal
-variable		sin_force equal swiggle(0,${AMPLITUDE},${MEMBRANE_FREQUENCY})
-fix                     wavee graphene addforce 0.0 0.0 v_sin_force
+# Prevent energy accumulation
 fix			vis all viscous 2
 
 # Reach oscillatory stability
