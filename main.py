@@ -95,7 +95,7 @@ class LampsRunner(object):
                     '-var', self.iterations_marker, self.iterations]
 
 	# call(commands2, stdout=open(os.devnull, 'wb'))
-	call(commands2)
+	call(commands)
 
 if __name__ == '__main__':
     """ Run lammps multiple times with python main.py """
@@ -109,7 +109,7 @@ if __name__ == '__main__':
     # 102.01 and 112.01 gave great results
     a_ball_mass     = [102.51]
     spring_factors  = [1.12]
-    sheet_radius    = 90
+    sheet_radius    = 140
 
 
     score_file  = 'data/single_ball.dat'
@@ -142,7 +142,7 @@ if __name__ == '__main__':
                             runner.set_sheet_radius(sheet_radius)
                             print "Radius of sheet:", sheet_radius
 
-                            runner.set_number_of_iterations(10000)
+                            runner.set_number_of_iterations(1000000)
                             runner.set_number_of_cores(4)
                             runner.run_it(template_file)
 
