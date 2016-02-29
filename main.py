@@ -142,25 +142,15 @@ if __name__ == '__main__':
                             runner.set_sheet_radius(sheet_radius)
                             print "Radius of sheet:", sheet_radius
 
-                            runner.set_number_of_iterations(5000)
+                            runner.set_number_of_iterations(10000)
                             runner.set_number_of_cores(4)
                             runner.run_it(template_file)
 
                             score = anal.read_pos(score_file)
 
                             # For oscillations related reaserch we only have one position in that file
-                            balls_z.append([pos[4] for pos in score])
-                            membranes_z.append([pos[1] for pos in score])
+                            balls_z.append([pos[2] for pos in score])
 
                             # Re-Save every step
-                            with open('data/ballsz.pickle', 'wb') as handle:
-                                pickle.dump(balls_z, handle)
-
-                            with open('data/membranesz.pickle', 'wb') as handle:
-                                pickle.dump(membranes_z, handle)
-
-    # plt.imshow(balls_z, aspect='auto')
-    # plt.show()
-    # plt.imshow(membranes_z, aspect='auto')
-    # plt.show()
-
+                            with open('data/ballsz.pickle', 'wb') as fout:
+                                pickle.dump(balls_z, fout)

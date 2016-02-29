@@ -5,8 +5,8 @@ def make_position_histogram(filepath, cmap='bone'):
     """ Choosing proper number of bins is important, apparently"""
     # Read the full path from 'data/single_ball.dat'
     scores = read_pos(filepath)
-    xx = [pos[2] for pos in scores]
-    yy = [pos[3] for pos in scores]
+    xx = [pos[0] for pos in scores]
+    yy = [pos[1] for pos in scores]
 
     # Number of bins is defined here by the suqare of number of measurements
     xedges = np.linspace(min(xx), max(xx), np.sqrt(len(xx)))
@@ -33,6 +33,7 @@ def read_pos(filepath):
 
     return out
 
+# OBSOLETE
 def show_fullerene():
     """ Show results for fullerene case OBSOLETE """
     apos = read_pos('data/a_fullerene_pos.dat')
@@ -46,6 +47,7 @@ def show_fullerene():
     plt.plot(z)
     plt.show()
 
+# OBSOLETE
 def show_single_ball():
     """ Better fixed hexagonal structure with heavy bouncer """
     apos = read_pos('data/single_ball.dat')
