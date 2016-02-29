@@ -68,6 +68,7 @@ class LampsRunner(object):
 
     def run_it(self, filepath):
 	""" Runs lammps """
+        # Unix mp-ready version
 	commands = ['mpirun', '-np', self.processes,
                     'lammps-daily',
                     # '-sf', 'omp',
@@ -82,9 +83,8 @@ class LampsRunner(object):
                     '-var', self.iterations_marker, self.iterations,
                     '-in', filepath]
 
-        # FIXME wtf why is this faster
-        # FIXME no-go on windows
-	commands2= ['lammps-daily',
+        # Windows slow version
+	commands2= ['lmp_serial', '-i', filepath,
                     '-var', self.amp_marker, self.amplitude,
                     '-var', self.gravity_marker, self.gravity,
                     '-var', self.spring_marker, self.spring_factor,
@@ -92,11 +92,10 @@ class LampsRunner(object):
                     '-var', self.frequency_marker, self.membrane_frequency,
                     '-var', self.a_mass_marker, self.a_mass,
                     '-var', self.sheet_radius_m, self.sheet_radius,
-                    '-var', self.iterations_marker, self.iterations,
-                    '-in', filepath]
+                    '-var', self.iterations_marker, self.iterations]
 
 	# call(commands2, stdout=open(os.devnull, 'wb'))
-	call(commands)
+	call(commands2)
 
 if __name__ == '__main__':
     """ Run lammps multiple times with python main.py """

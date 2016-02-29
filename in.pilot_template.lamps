@@ -2,16 +2,18 @@
 # {{{
 units                   real   
 atom_modify		sort 1 1  map array
-atom_style              charge
+atom_style              bond
 boundary                f f f
-
 processors		* * 1
-region		        sim_space block -8 320 -8 320 -50 50 units box
-create_box	        2 sim_space 
+# Simulation box is defined there
+read_data               structures/fake_bonds.what extra/bond/types 1 extra/atom/types 2
+# region		        sim_space block -8 320 -8 320 -50 50 units box
+# create_box	        2 sim_space 
 # }}}
 
 # Create graphene sheet
 # {{{
+bond_style              harmonic
 region                  graphene_space block -5 320 -5 320 -3 3 units box
 read_dump               structures/30nm_30nm_graphene.what 0 x y z box no add yes
 group                   graphene region graphene_space
@@ -44,15 +46,20 @@ neighbor        	1.0 bin
 neigh_modify    	every 1 delay 0
 
 pair_style		lj/cut 10.
+pair_coeff      	* * 0 1  1
 
-pair_coeff      	1 1  5.5939 1.26  10
+# pair_coeff              1 1  5.5939 1.26  10
 pair_coeff      	1 2  0.0000001139 19.510832  10
 pair_coeff      	2 2  0.1939 3.510832  10
+
+# Membrane holding potential
+bond_coeff		1 22222.1 213121.01
+create_bonds            graphene graphene 1 2.1 2.9
 # }}}
 
 # Full data dump
 # {{{
-dump                    my_dump all atom 160 pilotwaves.lammpstrj
+dump                    my_dump all atom 10 pilotwaves.lammpstrj
 thermo                  500
 thermo_style		custom step temp ke
 # }}}

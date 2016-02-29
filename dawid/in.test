@@ -1,47 +1,105 @@
+echo both
 units                   real
 atom_modify		sort 1 1  map array
 atom_style              bond
 boundary                f f f
 processors              * * 1
 
+# variable pool
+variable		thermo index 500
+variable		timestep index 10
+
+variable		mass1 index 10.0
+variable		mass2 index 50.0
+variable		mass3 index 10.0
+
+variable		mem_k index 2.0
+variable		mem_a index 1.0
+variable		froce_k index 1.0
+variable		force_a index 20.0
+
+variable		visc index 0.001
+variable		gravity index 2.0
+
+variable		period index 1800
+variable		amp  index 0.2
+
+variable		param_k index 0.001
+
+variable		pair_e index 0.0000001 
+variable		pair_a index 20.5
+
+variable		r index 101
+variable		r_offset index 10
+variable		r_in equal ${r}-${r_offset}
+
+variable		data index "o.dat"
+variable		dump_file index "pilot_wave.lammpstrj"
+variable		dump_freq index 20
+variable		run_len index 10000
+
 bond_style 		harmonic
+read_data		${data}
 
-read_data		membrane.dat
+# create jumping atoms 
+create_atoms		2 single 0 0 10 units box
+#create_atoms		2 single -20 11 10 units box
 
-create_atoms		3 single 0 0 10 units box
-create_atoms		3 single -10 11 10 units box
+# - end -
 
-bond_coeff		1 2 1
-bond_coeff		2 .8 10
+pair_style		lj/cut 10.0
+pair_coeff      	* * 0 1  1
+pair_coeff      	1 2 ${pair_e} ${pair_a}    10
+pair_coeff      	2 2 ${pair_e} ${pair_a}    10
+
+bond_coeff		1 ${mem_k} ${mem_a}
+bond_coeff		2 ${froce_k} ${force_a}
+
+mass 			1 ${mass1}
+mass 			2 ${mass2}
+mass 			3 ${mass3}
 
 neighbor        	1.0 bin
 neigh_modify    	every 1 delay 0
 
 fix                     NVE all nve
 
-timestep		10
-thermo			100
+timestep		${timestep}
+thermo			${thermo}
+
+# ---------------------------------------------------------
+
+group			membrane type 1
+group			particles type 2
+group			force_layer type 3
+
+region			cyl_out cylinder z 0 0 ${r} -1 1 units box
+region			cyl_in cylinder z 0 0 ${r_in} -1 1 units box
+group			cyl_out region cyl_out
+group			cyl_in region cyl_in
+group			ring subtract cyl_out cyl_in
+
+fix			ring ring setforce 0.0 0.0 0.0
 
 
-pair_style		lj/cut 10.
+fix                     gravity particles addforce 0.0 0.0 -${gravity}
 
-pair_coeff      	* * 0 1  1
-pair_coeff      	1 3  0.0000001139 20.510832  10
+fix			wiggle force_layer move wiggle 0.0 0.0 ${amp} ${period} units box
+# add potential well for particle
+variable		fx atom -x*(-${r_in}+ln(exp(sqrt(x^2+y^2))+exp(${r_in})))*${param_k}
+variable		fy atom -y*(-${r_in}+ln(exp(sqrt(x^2+y^2))+exp(${r_in})))*${param_k}
 
+fix			pot_well particles addforce v_fx v_fy 0
 
-
-#region			r_inner_cyl cylinder z 0 0 10 -20 -5
-#group			g_inner_cyl region r_inner_cyl
-group			g_inner_cyl type 2
-
-group			g_bouncer type 3
-
-fix                     gravity g_bouncer addforce 0.0 0.0 -2.6
-
-fix			wiggle g_inner_cyl move wiggle 0.0 0.0 0.3 1900 units box
+fix			vis membrane viscous ${visc}
 
 
-dump			MyDump all custom 20 argonW.lammpstrj element x y z
-dump_modify		MyDump sort id element C H Ag
+dump			MyDump all custom ${dump_freq} ${dump_file} element x y z
+dump_modify		MyDump sort id element Xe Pb He
 
-run 			30000
+compute			mem_com membrane com
+compute			force_com force_layer com
+
+
+
+run 			${run_len}
