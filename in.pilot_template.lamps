@@ -6,7 +6,8 @@ atom_style              bond
 boundary                f f f
 processors		* * 1
 # Simulation box is defined there
-read_data               structures/fake_bonds.what extra/bond/types 1 extra/atom/types 2
+read_data               structures/fake_bonds.what 
+# read_data               structures/fake_bonds.what extra/bond/types 1 extra/atom/types 2
 # region		        sim_space block -8 320 -8 320 -50 50 units box
 # create_box	        2 sim_space 
 # }}}
@@ -42,7 +43,7 @@ delete_atoms		group del
 
 # Potential settings
 # {{{
-neighbor        	1.0 bin
+neighbor        	3.0 bin
 neigh_modify    	every 1 delay 0
 
 pair_style		lj/cut 10.
@@ -53,8 +54,8 @@ pair_coeff      	1 2  0.0000001139 19.510832  10
 pair_coeff      	2 2  0.1939 3.510832  10
 
 # Membrane holding potential
-bond_coeff		1 22222.1 213121.01
-create_bonds            graphene graphene 1 2.1 2.9
+bond_coeff		1 1.1 1.01
+create_bonds            graphene graphene 1 2.1 3.0
 # }}}
 
 # Full data dump
