@@ -108,8 +108,10 @@ class LampsRunner(object):
                     '-var', self.mb_bond_r0_marker, self.mb_bond_r0
                     ]
 
-	call(commands, stdout=open(os.devnull, 'wb'))
-	# call(commands)
+        # Silent
+	# call(commands, stdout=open(os.devnull, 'wb'))
+        # Verbose
+	call(commands)
 
 if __name__ == '__main__':
     """ Run lammps multiple times with python main.py """
@@ -128,9 +130,6 @@ if __name__ == '__main__':
     frequencies     = 1000
     runner.set_membrane_frequency(frequencies)
 
-    # 102.01 and 112.01 gave great results
-    a_ball_mass     = 120.51
-    runner.set_a_ball_mass(a_ball_mass)
     # Freefall force
     gravities       = 10
     runner.set_gravity(gravities)
@@ -147,7 +146,11 @@ if __name__ == '__main__':
     runner.set_membrane_bond_harmonic_constant(membrane_bond_ks)
 
     # Membrane bonds equilibric distances
-    membrane_r_zeros = [0.5 + 0.1 * it for it in range(30)]
+    membrane_r_zeros = 1.76
+    runner.set_mb_bond_r(membrane_r_zeros)
+
+    # 102.01 and 112.01 gave great results
+    a_ball_mass     = [66]
 
     # Declare score paths
     ball_file = 'data/single_ball.dat'
@@ -158,13 +161,13 @@ if __name__ == '__main__':
     membranes_z = []
 
     # Final settings
-    runner.set_number_of_iterations(5000)
-    runner.set_number_of_cores(4)
+    runner.set_number_of_iterations(8000000)
+    runner.set_number_of_cores(6)
 
-    for val in membrane_r_zeros:
-        print 'current membrane harmonic constant value is now set to: ', val
+    for val in a_ball_mass:
+        print 'current mass value is now set to: ', val
         # Set value to check and check
-        runner.set_mb_bond_r(val)
+        runner.set_a_ball_mass(val)
         runner.run_it(template_file)
         # Read ball positions
         ball_score = an.read_pos(ball_file)

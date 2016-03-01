@@ -9,7 +9,9 @@ def make_position_histogram(filepath, cmap='bone'):
     yy = [pos[1] for pos in scores]
 
     # Number of bins is defined here by the suqare of number of measurements
-    xedges = np.linspace(min(xx), max(xx), np.sqrt(len(xx)))
+    minmin = min([min(xx), min(yy)])
+    maxmax = max([max(xx), max(yy)])
+    xedges = np.linspace(minmin, maxmax, np.sqrt(len(xx)))
     yedges = xedges
 
     # 
