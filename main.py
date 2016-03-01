@@ -134,7 +134,7 @@ if __name__ == '__main__':
     runner.set_sheet_radius(sheet_radius)
 
     # Tested parameter
-    membrane_bond_ks = [0.1 + 0.05 * it for it in range(20)]
+    membrane_bond_ks = [0.3 + 0.01 * it for it in range(11)]
 
     # Declare score paths
     ball_file = 'data/single_ball.dat'
@@ -145,7 +145,7 @@ if __name__ == '__main__':
     membranes_z = []
 
     # Final settings
-    runner.set_number_of_iterations(3000)
+    runner.set_number_of_iterations(8000)
     runner.set_number_of_cores(4)
 
     for kz in membrane_bond_ks:
