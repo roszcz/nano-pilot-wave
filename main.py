@@ -1,7 +1,7 @@
 from subprocess import call
 from matplotlib import pyplot as plt
 import os
-import anal
+import anal as an
 import pickle
 
 template_file   = 'in.pilot_template.lamps'
@@ -27,8 +27,13 @@ class LampsRunner(object):
         self.iterations          = '20000'
         self.sheet_radius_m      = 'SHEET_RADIUS'
         self.sheet_radius        = '88'
-
+        self.mb_bond_marker      = 'MEM_K'
+        self.mb_bond_k           = '0.6'
         self.processes           = '8'
+
+    def set_membrane_bond_harmonic_constant(self, kz):
+        """ wow """
+        self.mb_bond_k = str(kz)
 
     def set_number_of_cores(self, howmany):
         """ how """
@@ -71,8 +76,6 @@ class LampsRunner(object):
         # Unix mp-ready version
 	commands = ['mpirun', '-np', self.processes,
                     'lammps-daily',
-                    # '-sf', 'omp',
-                    # '-pk', 'omp', self.processes,
                     '-var', self.amp_marker, self.amplitude,
                     '-var', self.gravity_marker, self.gravity,
                     '-var', self.spring_marker, self.spring_factor,
@@ -81,6 +84,7 @@ class LampsRunner(object):
                     '-var', self.a_mass_marker, self.a_mass,
                     '-var', self.sheet_radius_m, self.sheet_radius,
                     '-var', self.iterations_marker, self.iterations,
+                    '-var', self.mb_bond_marker, self.mb_bond_k,
                     '-in', filepath]
 
         # Windows slow version
@@ -92,65 +96,81 @@ class LampsRunner(object):
                     '-var', self.frequency_marker, self.membrane_frequency,
                     '-var', self.a_mass_marker, self.a_mass,
                     '-var', self.sheet_radius_m, self.sheet_radius,
+                    '-var', self.mb_bond_marker, self.mb_bond_k,
                     '-var', self.iterations_marker, self.iterations]
 
-	# call(commands2, stdout=open(os.devnull, 'wb'))
-	call(commands)
+	call(commands, stdout=open(os.devnull, 'wb'))
+	# call(commands)
 
 if __name__ == '__main__':
     """ Run lammps multiple times with python main.py """
 
     runner = LampsRunner()
 
-    gravities       = [10]
-    frequencies     = [1000]
-    amplitudes      = [0.05]
-    a_ball_zs       = [-9]
+    # Driving force amplitude
+    amplitudes      = 0.05
+    runner.set_amplitude(amplitudes)
+
+    # Drop the ball from
+    a_ball_zs       = -9
+    runner.set_a_ball_height(a_ball_zs)
+
+    # Membrane driving force frequency
+    frequencies     = 1000
+    runner.set_membrane_frequency(frequencies)
+
     # 102.01 and 112.01 gave great results
-    a_ball_mass     = [102.51]
-    spring_factors  = [1.12]
-    sheet_radius    = 140
+    a_ball_mass     = 120.51
+    runner.set_a_ball_mass(a_ball_mass)
+    # Freefall force
+    gravities       = 10
+    runner.set_gravity(gravities)
 
+    # Spring constant of the membrane points
+    spring_factors  = 1.12
+    runner.set_spring_constant(spring_factors)
 
-    score_file  = 'data/single_ball.dat'
-    # score_file  = 'data/oscillations.dat'
+    sheet_radius    = 90
+    runner.set_sheet_radius(sheet_radius)
+
+    # Tested parameter
+    membrane_bond_ks = [0.1 + 0.05 * it for it in range(20)]
+
+    # Declare score paths
+    ball_file = 'data/single_ball.dat'
+    memb_file = 'data/membrane_pos.dat'
 
     # Prepare score containers
     balls_z     = []
     membranes_z = []
 
-    for gravity in gravities:
-	for freq in frequencies:
-            for amp in amplitudes:
-                for height in a_ball_zs:
-                    for kz in spring_factors:
-                        for mass in a_ball_mass:
-                            runner.set_a_ball_mass(mass)
-                            runner.set_membrane_frequency(freq)
-                            runner.set_gravity(gravity)
-                            runner.set_amplitude(amp)
-                            runner.set_a_ball_height(height)
-                            runner.set_spring_constant(kz)
+    # Final settings
+    runner.set_number_of_iterations(3000)
+    runner.set_number_of_cores(4)
 
-                            print "Gravity:", gravity
-                            print "Frequency:", freq
-                            print "Amplitude:", amp
-                            print "Ball wysokosc:", height
-                            print "Spring constant:", kz
-                            print "Ball's mass:", mass
+    for kz in membrane_bond_ks:
+        print 'current membrane harmonic constant value is now set to: ', kz
+        # Set value to check and check
+        runner.set_membrane_bond_harmonic_constant(kz)
+        runner.run_it(template_file)
 
-                            runner.set_sheet_radius(sheet_radius)
-                            print "Radius of sheet:", sheet_radius
+        # Read ball positions
+        ball_score = an.read_pos(ball_file)
+        bz = [pos[2] for pos in ball_score]
+        balls_z.append(bz)
 
-                            runner.set_number_of_iterations(1000000)
-                            runner.set_number_of_cores(4)
-                            runner.run_it(template_file)
+        # Membrane as well
+        memb_score = an.read_pos(memb_file)
+        mz = [pos[2] for pos in memb_score]
+        membranes_z.append(mz)
 
-                            score = anal.read_pos(score_file)
+        # Resave every iteration (you can see those live with ipython)
+        with open('data/ball.pickle', 'wb') as fout:
+            pickle.dump(balls_z, fout)
+        with open('data/memb.pickle', 'wb') as fout:
+            pickle.dump(membranes_z, fout)
 
-                            # For oscillations related reaserch we only have one position in that file
-                            balls_z.append([pos[2] for pos in score])
 
-                            # Re-Save every step
-                            with open('data/ballsz.pickle', 'wb') as fout:
-                                pickle.dump(balls_z, fout)
+
+    # score_file  = 'data/oscillations.dat'
+    # anal.make_position_histogram(score_file)
