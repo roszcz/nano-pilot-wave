@@ -54,7 +54,7 @@ pair_coeff      	1 2  0.0000001139 19.510832  10
 pair_coeff      	2 2  0.1939 3.510832  10
 
 # Membrane holding potential
-bond_coeff		1 ${MEM_K} 1.01
+bond_coeff		1 ${MEM_K} ${MEM_R0}
 create_bonds            graphene graphene 1 2.1 3.0
 # }}}
 

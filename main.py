@@ -29,11 +29,17 @@ class LampsRunner(object):
         self.sheet_radius        = '88'
         self.mb_bond_marker      = 'MEM_K'
         self.mb_bond_k           = '0.6'
+        self.mb_bond_r0_marker   = 'MEM_R0'
+        self.mb_bond_r0          = '1.1'
         self.processes           = '8'
 
     def set_membrane_bond_harmonic_constant(self, kz):
         """ wow """
         self.mb_bond_k = str(kz)
+
+    def set_mb_bond_r(self, angstroms):
+        """ Equilibrium distance """
+        self.mb_bond_r0 = str(angstroms)
 
     def set_number_of_cores(self, howmany):
         """ how """
@@ -85,6 +91,7 @@ class LampsRunner(object):
                     '-var', self.sheet_radius_m, self.sheet_radius,
                     '-var', self.iterations_marker, self.iterations,
                     '-var', self.mb_bond_marker, self.mb_bond_k,
+                    '-var', self.mb_bond_r0_marker, self.mb_bond_r0,
                     '-in', filepath]
 
         # Windows slow version
@@ -97,7 +104,9 @@ class LampsRunner(object):
                     '-var', self.a_mass_marker, self.a_mass,
                     '-var', self.sheet_radius_m, self.sheet_radius,
                     '-var', self.mb_bond_marker, self.mb_bond_k,
-                    '-var', self.iterations_marker, self.iterations]
+                    '-var', self.iterations_marker, self.iterations,
+                    '-var', self.mb_bond_r0_marker, self.mb_bond_r0
+                    ]
 
 	call(commands, stdout=open(os.devnull, 'wb'))
 	# call(commands)
@@ -133,8 +142,12 @@ if __name__ == '__main__':
     sheet_radius    = 90
     runner.set_sheet_radius(sheet_radius)
 
-    # Tested parameter
-    membrane_bond_ks = [0.3 + 0.01 * it for it in range(11)]
+    # Membrane harmonic constant
+    membrane_bond_ks = 0.35
+    runner.set_membrane_bond_harmonic_constant(membrane_bond_ks)
+
+    # Membrane bonds equilibric distances
+    membrane_r_zeros = [0.5 + 0.1 * it for it in range(30)]
 
     # Declare score paths
     ball_file = 'data/single_ball.dat'
@@ -145,15 +158,14 @@ if __name__ == '__main__':
     membranes_z = []
 
     # Final settings
-    runner.set_number_of_iterations(8000)
+    runner.set_number_of_iterations(5000)
     runner.set_number_of_cores(4)
 
-    for kz in membrane_bond_ks:
-        print 'current membrane harmonic constant value is now set to: ', kz
+    for val in membrane_r_zeros:
+        print 'current membrane harmonic constant value is now set to: ', val
         # Set value to check and check
-        runner.set_membrane_bond_harmonic_constant(kz)
+        runner.set_mb_bond_r(val)
         runner.run_it(template_file)
-
         # Read ball positions
         ball_score = an.read_pos(ball_file)
         bz = [pos[2] for pos in ball_score]
