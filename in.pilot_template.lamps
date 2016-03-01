@@ -1,79 +1,115 @@
+# Units and simulation box
+# {{{
 units                   real   
 atom_modify		sort 1 1  map array
-atom_style              charge
+atom_style              bond
 boundary                f f f
-
 processors		* * 1
-region		        sim_space block -8 320 -8 320 -50 50 units box
-create_box	        2 sim_space 
-
+# Simulation box, atom types and some bonds info
+read_data               structures/fake_bonds.what 
+# }}}
 
 # Create graphene sheet
+# {{{
+bond_style              harmonic
 region                  graphene_space block -5 320 -5 320 -3 3 units box
 read_dump               structures/30nm_30nm_graphene.what 0 x y z box no add yes
 group                   graphene region graphene_space
+# }}}
 
+# Declare masses
+# membrane is 1, ball is 2 {{{
 mass                    1 12.01
 mass                    2 ${A_BALL_MASS}
+# }}}
 
+# Create ball
+# {{{
 create_atoms		2 single 150 150 ${A_BALL_HEIGHT} units box
 region                  a_ball_space sphere 150 150 ${A_BALL_HEIGHT} 7 units box
 group                   a_ball region a_ball_space
-# This is temporary
+# }}}
 
-# Removing atoms for debug agility, remove this TODO
+# Reshape the grapheneish membrane 
+# {{{
+# Keep a circle
 region			notDel sphere 150 150 0 ${SHEET_RADIUS} units box
 group			notDel region notDel
 group			del subtract all notDel
 delete_atoms		group del
+# }}}
 
 # Potential settings
-neighbor        	1.0 bin
+# {{{
+# TODO not sure what is this for really
+neighbor        	3.0 bin
 neigh_modify    	every 1 delay 0
 
 pair_style		lj/cut 10.
+pair_coeff      	* * 0 1  1
 
-pair_coeff      	1 1  5.5939 1.26  10
+# LJ is now only for interaction between membrane and bouncers
+# pair_coeff              1 1  5.5939 1.26  10
 pair_coeff      	1 2  0.0000001139 19.510832  10
 pair_coeff      	2 2  0.1939 3.510832  10
 
+# Membrane holding potential
+bond_coeff		1 1.1 1.01
+create_bonds            graphene graphene 1 2.1 3.0
+# }}}
 
 # Full data dump
-dump                    my_dump all atom 160 pilotwaves.lammpstrj
-
+# {{{
+dump                    my_dump all atom 10 pilotwaves.lammpstrj
 thermo                  500
 thermo_style		custom step temp ke
+# }}}
 
-
+# Setup timestep and NVE
+# {{{
 fix                     NVE all nve
-
 timestep		6
+# }}}
 
+# Wacing sheet 
+# Every point of the membrane is a forced oscillator {{{
 fix                     graphene_spring graphene spring/self ${SPRING_CONSTANT} z
-
-# Allow graphene atoms to move up or down only
-fix			move_vertical graphene setforce 0.0 0.0 NULL
-
-variable		x_free_atom equal x[1]
-variable		y_free_atom equal y[1]
-variable		z_free_atom equal z[1]
-variable		membrane_atom equal z[4323]
-variable		time_step equal step
-
-fix			fp all print 160 "${time_step} ${membrane_atom} ${x_free_atom} ${y_free_atom} ${z_free_atom}" file data/single_ball.dat screen no
-
-velocity		all set 0 0 0 units box
-
-# Force needs to be cosinuoidal
+# With sinusoidal driving force
 variable		sin_force equal swiggle(0,${AMPLITUDE},${MEMBRANE_FREQUENCY})
 fix                     wavee graphene addforce 0.0 0.0 v_sin_force
-fix			vis all viscous 2
+# Allow graphene atoms to move up or down only
+fix			move_vertical graphene setforce 0.0 0.0 NULL
+# }}}
 
-# Reach oscillatory stability
+# Write some coordinates to a seperate files
+# {{{
+# First ball
+compute			fa_com a_ball com
+variable                fa_x_com equal c_fa_com[1]
+variable                fa_y_com equal c_fa_com[2]
+variable                fa_z_com equal c_fa_com[3]
+
+fix			fp all print 10 "${fa_x_com} ${fa_y_com} ${fa_z_com}" file data/single_ball.dat screen no
+
+# Some part of the membrane
+region			membrane_part sphere 100 100 0 3 units box
+group			membrane_pos region membrane_part
+compute			mpart_com membrane_pos com
+variable                mpart_x_com equal c_mpart_com[1]
+variable                mpart_y_com equal c_mpart_com[2]
+variable                mpart_z_com equal c_mpart_com[3]
+fix			fp all print 10 "${mpart_x_com} ${mpart_y_com} ${mpart_z_com}" file data/membrane_pos.dat screen no
+# }}}
+
+# Reach oscillatory stability 
+# Start standing still {{{
+velocity		all set 0 0 0 units box
+# Prevent energy accumulation
+fix			vis all viscous 2
 run                     5000
+# }}}
 
 # Drop the ball
 fix                     gravity a_ball addforce 0.0 0.0 ${GRAVITY}
 
 run			${ITERATIONS}
-

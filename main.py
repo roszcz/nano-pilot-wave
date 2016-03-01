@@ -68,10 +68,11 @@ class LampsRunner(object):
 
     def run_it(self, filepath):
 	""" Runs lammps """
+        # Unix mp-ready version
 	commands = ['mpirun', '-np', self.processes,
                     'lammps-daily',
-                    '-sf', 'omp',
-                    '-pk', 'omp', self.processes,
+                    # '-sf', 'omp',
+                    # '-pk', 'omp', self.processes,
                     '-var', self.amp_marker, self.amplitude,
                     '-var', self.gravity_marker, self.gravity,
                     '-var', self.spring_marker, self.spring_factor,
@@ -82,9 +83,8 @@ class LampsRunner(object):
                     '-var', self.iterations_marker, self.iterations,
                     '-in', filepath]
 
-        # FIXME wtf why is this faster
-        # FIXME no-go on windows
-	commands2= ['lammps-daily',
+        # Windows slow version
+	commands2= ['lmp_serial', '-i', filepath,
                     '-var', self.amp_marker, self.amplitude,
                     '-var', self.gravity_marker, self.gravity,
                     '-var', self.spring_marker, self.spring_factor,
@@ -92,11 +92,10 @@ class LampsRunner(object):
                     '-var', self.frequency_marker, self.membrane_frequency,
                     '-var', self.a_mass_marker, self.a_mass,
                     '-var', self.sheet_radius_m, self.sheet_radius,
-                    '-var', self.iterations_marker, self.iterations,
-                    '-in', filepath]
+                    '-var', self.iterations_marker, self.iterations]
 
 	# call(commands2, stdout=open(os.devnull, 'wb'))
-	call(commands2)
+	call(commands)
 
 if __name__ == '__main__':
     """ Run lammps multiple times with python main.py """
@@ -110,7 +109,7 @@ if __name__ == '__main__':
     # 102.01 and 112.01 gave great results
     a_ball_mass     = [102.51]
     spring_factors  = [1.12]
-    sheet_radius    = 90
+    sheet_radius    = 140
 
 
     score_file  = 'data/single_ball.dat'
@@ -143,25 +142,15 @@ if __name__ == '__main__':
                             runner.set_sheet_radius(sheet_radius)
                             print "Radius of sheet:", sheet_radius
 
-                            runner.set_number_of_iterations(50000000)
+                            runner.set_number_of_iterations(1000000)
                             runner.set_number_of_cores(4)
                             runner.run_it(template_file)
 
                             score = anal.read_pos(score_file)
 
                             # For oscillations related reaserch we only have one position in that file
-                            balls_z.append([pos[4] for pos in score])
-                            membranes_z.append([pos[1] for pos in score])
+                            balls_z.append([pos[2] for pos in score])
 
                             # Re-Save every step
-                            with open('data/ballsz.pickle', 'wb') as handle:
-                                pickle.dump(balls_z, handle)
-
-                            with open('data/membranesz.pickle', 'wb') as handle:
-                                pickle.dump(membranes_z, handle)
-
-    # plt.imshow(balls_z, aspect='auto')
-    # plt.show()
-    # plt.imshow(membranes_z, aspect='auto')
-    # plt.show()
-
+                            with open('data/ballsz.pickle', 'wb') as fout:
+                                pickle.dump(balls_z, fout)

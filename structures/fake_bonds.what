@@ -1,0 +1,10 @@
+# File with bond declaration
+
+ 2 atom types
+ 1 bond types
+ 8 extra bond per atom
+
+ -8.000000 320.000000 xlo xhi
+ -8.000000 320.000000 ylo yhi
+ -50.000000 50.000000 zlo zhi
+ 
