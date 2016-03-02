@@ -28,6 +28,7 @@ mass                    2 ${A_BALL_MASS}
 create_atoms		2 single 150 150 ${A_BALL_HEIGHT} units box
 region                  a_ball_space sphere 150 150 ${A_BALL_HEIGHT} 7 units box
 group                   a_ball region a_ball_space
+fix			ball_no_go a_ball setforce 0.0 0.0 0.0
 # }}}
 
 # Reshape the grapheneish membrane 
@@ -61,7 +62,7 @@ create_bonds            graphene graphene 1 2.1 3.0
 # Full data dump
 # {{{
 dump                    my_dump all atom 10 pilotwaves.lammpstrj
-thermo                  500
+thermo                  1000
 thermo_style		custom step temp ke
 # }}}
 
@@ -110,6 +111,7 @@ run                     4000
 # }}}
 
 # Drop the ball
+unfix			ball_no_go
 fix                     gravity a_ball addforce 0.0 0.0 ${GRAVITY}
 
 run			${ITERATIONS}

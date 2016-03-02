@@ -109,30 +109,19 @@ class LampsRunner(object):
                     ]
 
         # Silent
-	# call(commands, stdout=open(os.devnull, 'wb'))
+	call(commands, stdout=open(os.devnull, 'wb'))
+
         # Verbose
-	call(commands)
+	# call(commands)
 
 if __name__ == '__main__':
     """ Run lammps multiple times with python main.py """
 
     runner = LampsRunner()
 
-    # Driving force amplitude
-    amplitudes      = 0.05
-    runner.set_amplitude(amplitudes)
-
     # Drop the ball from
     a_ball_zs       = -9
     runner.set_a_ball_height(a_ball_zs)
-
-    # Membrane driving force frequency
-    frequencies     = 1000
-    runner.set_membrane_frequency(frequencies)
-
-    # Freefall force
-    gravities       = 10
-    runner.set_gravity(gravities)
 
     # Spring constant of the membrane points
     spring_factors  = 1.12
@@ -142,7 +131,7 @@ if __name__ == '__main__':
     runner.set_sheet_radius(sheet_radius)
 
     # Membrane harmonic constant
-    membrane_bond_ks = 0.35
+    membrane_bond_ks = 0.6
     runner.set_membrane_bond_harmonic_constant(membrane_bond_ks)
 
     # Membrane bonds equilibric distances
@@ -150,7 +139,19 @@ if __name__ == '__main__':
     runner.set_mb_bond_r(membrane_r_zeros)
 
     # 102.01 and 112.01 gave great results
-    a_ball_mass     = [66]
+    a_ball_mass     = 66
+    runner.set_a_ball_mass(a_ball_mass)
+
+    # Freefall force
+    gravity         = 13.01
+    runner.set_gravity(gravity)
+
+    # Driving force amplitude
+    amplitudes      = 0.042
+    runner.set_amplitude(amplitudes)
+
+    # Membrane driving force frequency
+    frequencies     = [900 + 10 * it for it in range(20)]
 
     # Declare score paths
     ball_file = 'data/single_ball.dat'
@@ -161,13 +162,13 @@ if __name__ == '__main__':
     membranes_z = []
 
     # Final settings
-    runner.set_number_of_iterations(8000000)
-    runner.set_number_of_cores(6)
+    runner.set_number_of_iterations(int(8e3))
+    runner.set_number_of_cores(8)
 
-    for val in a_ball_mass:
-        print 'current mass value is now set to: ', val
+    for val in frequencies:
+        print 'current value is now set to: ', val
         # Set value to check and check
-        runner.set_a_ball_mass(val)
+        runner.set_membrane_frequency(val)
         runner.run_it(template_file)
         # Read ball positions
         ball_score = an.read_pos(ball_file)
