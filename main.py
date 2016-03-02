@@ -119,10 +119,6 @@ if __name__ == '__main__':
 
     runner = LampsRunner()
 
-    # Drop the ball from
-    a_ball_zs       = -9
-    runner.set_a_ball_height(a_ball_zs)
-
     # Spring constant of the membrane points
     spring_factors  = 1.12
     runner.set_spring_constant(spring_factors)
@@ -138,20 +134,24 @@ if __name__ == '__main__':
     membrane_r_zeros = 1.76
     runner.set_mb_bond_r(membrane_r_zeros)
 
-    # 102.01 and 112.01 gave great results
-    a_ball_mass     = 66
-    runner.set_a_ball_mass(a_ball_mass)
-
     # Freefall force
     gravity         = 13.01
     runner.set_gravity(gravity)
+
+    # Membrane driving force frequency
+    frequencies     = 1064
+    runner.set_membrane_frequency(frequencies)
 
     # Driving force amplitude
     amplitudes      = 0.042
     runner.set_amplitude(amplitudes)
 
-    # Membrane driving force frequency
-    frequencies     = [900 + 10 * it for it in range(20)]
+    # 102.01 and 112.01 gave great results
+    a_ball_mass     = 66
+    runner.set_a_ball_mass(a_ball_mass)
+
+    # Drop the ball from
+    a_ball_zs       = [-9 + 0.2 * it for it in range(30)]
 
     # Declare score paths
     ball_file = 'data/single_ball.dat'
@@ -165,10 +165,10 @@ if __name__ == '__main__':
     runner.set_number_of_iterations(int(8e3))
     runner.set_number_of_cores(8)
 
-    for val in frequencies:
+    for val in a_ball_zs:
         print 'current value is now set to: ', val
         # Set value to check and check
-        runner.set_membrane_frequency(val)
+        runner.set_a_ball_height(val)
         runner.run_it(template_file)
         # Read ball positions
         ball_score = an.read_pos(ball_file)
