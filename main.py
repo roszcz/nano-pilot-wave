@@ -109,10 +109,10 @@ class LampsRunner(object):
                     ]
 
         # Silent
-	call(commands, stdout=open(os.devnull, 'wb'))
+	# call(commands, stdout=open(os.devnull, 'wb'))
 
         # Verbose
-	# call(commands)
+	call(commands)
 
 if __name__ == '__main__':
     """ Run lammps multiple times with python main.py """
@@ -151,7 +151,7 @@ if __name__ == '__main__':
     runner.set_amplitude(amplitudes)
 
     # 102.01 and 112.01 gave great results
-    a_ball_mass     = [100 + 3 * it for it in range(20)]
+    a_ball_mass     = [121 + 3 * it for it in range(1)]
 
     # Declare score paths
     ball_file = 'data/single_ball.dat'
@@ -162,7 +162,7 @@ if __name__ == '__main__':
     membranes_z = []
 
     # Final settings
-    runner.set_number_of_iterations(int(12e3))
+    runner.set_number_of_iterations(int(12e7))
     runner.set_number_of_cores(8)
 
     for val in a_ball_mass:

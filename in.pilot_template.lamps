@@ -61,8 +61,8 @@ create_bonds            graphene graphene 1 2.1 3.0
 
 # Full data dump
 # {{{
-dump                    my_dump all atom 10 pilotwaves.lammpstrj
-thermo                  1000
+dump                    my_dump all atom 160 pilotwaves.lammpstrj
+thermo                  5000
 thermo_style		custom step temp ke
 # }}}
 
@@ -90,7 +90,7 @@ variable                fa_x_com equal c_fa_com[1]
 variable                fa_y_com equal c_fa_com[2]
 variable                fa_z_com equal c_fa_com[3]
 
-fix			ball_cout all print 10 "${fa_x_com} ${fa_y_com} ${fa_z_com}" file data/single_ball.dat screen no
+fix			ball_cout all print 160 "${fa_x_com} ${fa_y_com} ${fa_z_com}" file data/single_ball.dat screen no
 
 # Some part of the membrane
 region			membrane_part sphere 100 100 0 3 units box
@@ -99,7 +99,7 @@ compute			mpart_com membrane_pos com
 variable                mpart_x_com equal c_mpart_com[1]
 variable                mpart_y_com equal c_mpart_com[2]
 variable                mpart_z_com equal c_mpart_com[3]
-fix			memb_cout all print 10 "${mpart_x_com} ${mpart_y_com} ${mpart_z_com}" file data/membrane_pos.dat screen no
+fix			memb_cout all print 160 "${mpart_x_com} ${mpart_y_com} ${mpart_z_com}" file data/membrane_pos.dat screen no
 # }}}
 
 # Reach oscillatory stability 
