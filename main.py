@@ -123,7 +123,7 @@ if __name__ == '__main__':
     spring_factors  = 1.12
     runner.set_spring_constant(spring_factors)
 
-    sheet_radius    = 90
+    sheet_radius    = 80
     runner.set_sheet_radius(sheet_radius)
 
     # Membrane harmonic constant

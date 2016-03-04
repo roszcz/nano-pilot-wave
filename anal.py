@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-def make_position_histogram(filepath, cmap='bone'):
+def make_position_histogram(filepath, limits=None, cmap='bone'):
     """ Choosing proper number of bins is important, apparently"""
     # Read the full path from 'data/single_ball.dat'
     scores = read_pos(filepath)
@@ -9,8 +9,13 @@ def make_position_histogram(filepath, cmap='bone'):
     yy = [pos[1] for pos in scores]
 
     # Number of bins is defined here by the suqare of number of measurements
-    minmin = min([min(xx), min(yy)])
-    maxmax = max([max(xx), max(yy)])
+    if not limits:
+	minmin = min([min(xx), min(yy)])
+	maxmax = max([max(xx), max(yy)])
+    else:
+	minmin = limits[0]
+	maxmax = limits[1]
+
     xedges = np.linspace(minmin, maxmax, np.sqrt(len(xx)))
     yedges = xedges
 

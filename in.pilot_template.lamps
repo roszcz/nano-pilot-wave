@@ -61,7 +61,13 @@ create_bonds            graphene graphene 1 2.1 3.0
 
 # Full data dump
 # {{{
-dump                    my_dump all atom 160 pilotwaves.lammpstrj
+# Get membrane z-position mean value
+compute			mem_com graphene com
+variable		mem_com equal c_mem_com[3]
+variable		z_dev atom v_mem_com-z
+dump			my_dump all custom 160 pilotwaves.lammpstrj id type x y z v_z_dev
+dump_modify		my_dump sort id 
+# dump                    my_dump all atom 160 pilotwaves.lammpstrj
 thermo                  5000
 thermo_style		custom step temp ke
 # }}}
