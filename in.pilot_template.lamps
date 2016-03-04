@@ -25,8 +25,9 @@ mass                    2 ${A_BALL_MASS}
 
 # Create ball
 # {{{
-create_atoms		2 single 150 150 ${A_BALL_HEIGHT} units box
-region                  a_ball_space sphere 150 150 ${A_BALL_HEIGHT} 7 units box
+# TODO Make starting position settable
+create_atoms		2 single 150 120 ${A_BALL_HEIGHT} units box
+region                  a_ball_space sphere 150 120 ${A_BALL_HEIGHT} 7 units box
 group                   a_ball region a_ball_space
 fix			ball_no_go a_ball setforce 0.0 0.0 0.0
 # }}}
