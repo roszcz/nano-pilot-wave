@@ -123,7 +123,7 @@ if __name__ == '__main__':
     spring_factors  = 1.12
     runner.set_spring_constant(spring_factors)
 
-    sheet_radius    = 80
+    sheet_radius    = 60
     runner.set_sheet_radius(sheet_radius)
 
     # Membrane harmonic constant
@@ -163,7 +163,7 @@ if __name__ == '__main__':
 
     # Final settings
     runner.set_number_of_iterations(int(12e7))
-    runner.set_number_of_cores(8)
+    runner.set_number_of_cores(4)
 
     for val in a_ball_mass:
         print 'current value is now set to: ', val
