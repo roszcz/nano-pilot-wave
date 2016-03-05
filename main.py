@@ -152,29 +152,29 @@ if __name__ == '__main__':
     runner.set_a_ball_mass(a_ball_mass)
 
     # Membrane size
-    sheet_radius    = [50 + it for it in range(30)]
+    sheet_radius    = [55 + it for it in range(11)]
 
     # Declare score paths
     ball_file = 'data/single_ball.dat'
     memb_file = 'data/membrane_pos.dat'
 
     # Prepare score containers
-    balls_z     = []
+    ball_pos    = []
     membranes_z = []
 
     # Final settings
-    runner.set_number_of_iterations(int(5e5))
-    runner.set_number_of_cores(4)
+    runner.set_number_of_iterations(int(1e6))
+    runner.set_number_of_cores(8)
 
     for val in sheet_radius:
         print 'current value is now set to: ', val
         # Set value to check and check
         runner.set_sheet_radius(val)
         runner.run_it(template_file)
-        # Read ball positions
+
+        # Write ball positions
         ball_score = an.read_pos(ball_file)
-        bz = [pos[2] for pos in ball_score]
-        balls_z.append(bz)
+        ball_pos.append(ball_score)
 
         # Membrane as well
         memb_score = an.read_pos(memb_file)
@@ -183,11 +183,11 @@ if __name__ == '__main__':
 
         # Save histogram after each run
         savepath = 'plots/membrane_radius_histograms/radius_{}.png'.format(val)
-        an.make_position_histogram(ball_file, limits=[100, 200], savepath=savepath)
+        an.make_position_histogram(ball_file, limits=[130, 170], savepath=savepath)
 
         # Resave every iteration (you can see those live with ipython)
         with open('data/ball.pickle', 'wb') as fout:
-            pickle.dump(balls_z, fout)
+            pickle.dump(ball_pos, fout)
         with open('data/memb.pickle', 'wb') as fout:
             pickle.dump(membranes_z, fout)
 
