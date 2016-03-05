@@ -123,9 +123,6 @@ if __name__ == '__main__':
     spring_factors  = 1.12
     runner.set_spring_constant(spring_factors)
 
-    sheet_radius    = 60
-    runner.set_sheet_radius(sheet_radius)
-
     # Membrane harmonic constant
     membrane_bond_ks = 0.6
     runner.set_membrane_bond_harmonic_constant(membrane_bond_ks)
@@ -151,7 +148,11 @@ if __name__ == '__main__':
     runner.set_amplitude(amplitudes)
 
     # 102.01 and 112.01 gave great results
-    a_ball_mass     = [121 + 3 * it for it in range(1)]
+    a_ball_mass     = 121
+    runner.set_a_ball_mass(a_ball_mass)
+
+    # Membrane size
+    sheet_radius    = [50 + it for it in range(30)]
 
     # Declare score paths
     ball_file = 'data/single_ball.dat'
@@ -162,13 +163,13 @@ if __name__ == '__main__':
     membranes_z = []
 
     # Final settings
-    runner.set_number_of_iterations(int(12e7))
+    runner.set_number_of_iterations(int(5e5))
     runner.set_number_of_cores(4)
 
-    for val in a_ball_mass:
+    for val in sheet_radius:
         print 'current value is now set to: ', val
         # Set value to check and check
-        runner.set_a_ball_mass(val)
+        runner.set_sheet_radius(val)
         runner.run_it(template_file)
         # Read ball positions
         ball_score = an.read_pos(ball_file)
@@ -179,6 +180,10 @@ if __name__ == '__main__':
         memb_score = an.read_pos(memb_file)
         mz = [pos[2] for pos in memb_score]
         membranes_z.append(mz)
+
+        # Save histogram after each run
+        savepath = 'plots/membrane_radius_histograms/radius_{}.png'.format(val)
+        an.make_position_histogram(ball_file, limits=[100, 200], savepath=savepath)
 
         # Resave every iteration (you can see those live with ipython)
         with open('data/ball.pickle', 'wb') as fout:
