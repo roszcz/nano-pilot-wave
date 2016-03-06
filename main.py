@@ -152,7 +152,7 @@ if __name__ == '__main__':
     runner.set_a_ball_mass(a_ball_mass)
 
     # Membrane size
-    sheet_radius    = [55 + it for it in range(11)]
+    sheet_radius    = [57 + it for it in range(7)]
 
     # Declare score paths
     ball_file = 'data/single_ball.dat'
@@ -163,7 +163,7 @@ if __name__ == '__main__':
     membranes_z = []
 
     # Final settings
-    runner.set_number_of_iterations(int(1e6))
+    runner.set_number_of_iterations(int(1e7))
     runner.set_number_of_cores(8)
 
     for val in sheet_radius:
