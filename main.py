@@ -32,6 +32,8 @@ class LampsRunner(object):
         self.mb_bond_r0_marker   = 'MEM_R0'
         self.mb_bond_r0          = '1.1'
         self.processes           = '8'
+        self.a_ball_x_m          = 'a_ball_x'
+        self.a_ball_x            = '150'
 
     def set_membrane_bond_harmonic_constant(self, kz):
         """ wow """
@@ -77,6 +79,10 @@ class LampsRunner(object):
 	""" set me """
 	self.membrane_frequency = str(freq)
 
+    def set_a_ball_x(self, x):
+        """ STarting position x """
+        self.a_ball_x = str(x)
+
     def run_it(self, filepath):
 	""" Runs lammps """
         # Unix mp-ready version
@@ -92,6 +98,7 @@ class LampsRunner(object):
                     '-var', self.iterations_marker, self.iterations,
                     '-var', self.mb_bond_marker, self.mb_bond_k,
                     '-var', self.mb_bond_r0_marker, self.mb_bond_r0,
+                    '-var', self.a_ball_x_m, self.a_ball_x,
                     '-in', filepath]
 
         # Windows slow version
@@ -105,7 +112,8 @@ class LampsRunner(object):
                     '-var', self.sheet_radius_m, self.sheet_radius,
                     '-var', self.mb_bond_marker, self.mb_bond_k,
                     '-var', self.iterations_marker, self.iterations,
-                    '-var', self.mb_bond_r0_marker, self.mb_bond_r0
+                    '-var', self.mb_bond_r0_marker, self.mb_bond_r0,
+                    '-var', self.a_ball_x_m, self.a_ball_x
                     ]
 
         # Silent
@@ -152,7 +160,11 @@ if __name__ == '__main__':
     runner.set_a_ball_mass(a_ball_mass)
 
     # Membrane size
-    sheet_radius    = [62.95, 62.97, 62.99]
+    sheet_radius    = 58
+    runner.set_sheet_radius(sheet_radius)
+
+    # Ball starting postion
+    x_position = [140 + 2 * it for it in range(11)]
 
     # Declare score paths
     ball_file = 'data/single_ball.dat'
@@ -163,13 +175,13 @@ if __name__ == '__main__':
     membranes_z = []
 
     # Final settings
-    runner.set_number_of_iterations(int(1e7))
+    runner.set_number_of_iterations(int(5e6))
     runner.set_number_of_cores(8)
 
-    for val in sheet_radius:
+    for val in x_position:
         print 'current value is now set to: ', val
         # Set value to check and check
-        runner.set_sheet_radius(val)
+        runner.set_a_ball_x(val)
         runner.run_it(template_file)
 
         # Write ball positions
@@ -182,7 +194,7 @@ if __name__ == '__main__':
         membranes_z.append(mz)
 
         # Save histogram after each run
-        savepath = 'plots/membrane_radius_histograms/radius_{}.png'.format(val)
+        savepath = 'plots/start_position/x_pos{}.png'.format(val)
         an.make_position_histogram(ball_file, limits=[130, 170], savepath=savepath)
 
         # Resave every iteration (you can see those live with ipython)

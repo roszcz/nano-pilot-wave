@@ -26,8 +26,8 @@ mass                    2 ${A_BALL_MASS}
 # Create ball
 # {{{
 # TODO Make starting position settable
-create_atoms		2 single 150 150 ${A_BALL_HEIGHT} units box
-region                  a_ball_space sphere 150 150 ${A_BALL_HEIGHT} 7 units box
+create_atoms		2 single ${a_ball_x} 150 ${A_BALL_HEIGHT} units box
+region                  a_ball_space sphere ${a_ball_x} 150 ${A_BALL_HEIGHT} 7 units box
 group                   a_ball region a_ball_space
 fix			ball_no_go a_ball setforce 0.0 0.0 0.0
 # }}}
@@ -96,7 +96,7 @@ variable                fa_x_com equal c_fa_com[1]
 variable                fa_y_com equal c_fa_com[2]
 variable                fa_z_com equal c_fa_com[3]
 
-fix			ball_cout all print 160 "${fa_x_com} ${fa_y_com} ${fa_z_com}" file data/single_ball.dat screen no
+fix			ball_cout all print 80 "${fa_x_com} ${fa_y_com} ${fa_z_com}" file data/single_ball.dat screen no
 
 # Some part of the membrane
 region			membrane_part sphere 100 100 0 3 units box
