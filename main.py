@@ -164,7 +164,7 @@ if __name__ == '__main__':
     runner.set_sheet_radius(sheet_radius)
 
     # Ball starting postion
-    x_position = [140 + 2 * it for it in range(11)]
+    x_position = [110 + 7 * it for it in range(3)]
 
     # Declare score paths
     ball_file = 'data/single_ball.dat'
