@@ -160,7 +160,7 @@ if __name__ == '__main__':
     runner.set_a_ball_mass(a_ball_mass)
 
     # Membrane size
-    sheet_radius    = 52
+    sheet_radius    = 58
     runner.set_sheet_radius(sheet_radius)
 
     # Ball starting postion
