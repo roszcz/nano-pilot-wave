@@ -160,7 +160,7 @@ if __name__ == '__main__':
     runner.set_a_ball_mass(a_ball_mass)
 
     # Membrane size
-    sheet_radius    = 58
+    sheet_radius    = 88
     runner.set_sheet_radius(sheet_radius)
 
     # Ball starting postion
@@ -194,8 +194,8 @@ if __name__ == '__main__':
         membranes_z.append(mz)
 
         # Save histogram after each run
-        savepath = 'plots/start_position/x_pos{}.png'.format(val)
-        an.make_position_histogram(ball_file, limits=[130, 170], savepath=savepath)
+        # savepath = 'plots/start_position/x_pos{}.png'.format(val)
+        # an.make_position_histogram(ball_file, limits=[130, 170], savepath=savepath)
 
         # Resave every iteration (you can see those live with ipython)
         with open('data/ball.pickle', 'wb') as fout:
