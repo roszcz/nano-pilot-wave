@@ -1,0 +1,134 @@
+# Units and simulation box
+# {{{
+units                   real   
+atom_modify		sort 1 1  map array
+atom_style              bond
+boundary                f f f
+processors		* * 1
+# Simulation box, atom types and some bonds info
+read_data               structures/fake_bonds.what 
+# }}}
+
+# Create graphene sheet
+# {{{
+bond_style              harmonic
+region                  graphene_space block -5 320 -5 320 -3 3 units box
+read_dump               structures/30nm_30nm_graphene.what 0 x y z box no add yes
+group                   graphene region graphene_space
+# }}}
+
+# Declare masses
+# membrane is 1, ball is 2 {{{
+mass                    1 12.01
+mass                    2 ${A_BALL_MASS}
+# }}}
+
+# Create ball
+# {{{
+# TODO Make starting position settable
+create_atoms		2 single ${a_ball_x} ${a_ball_y} ${A_BALL_HEIGHT} units box
+region                  a_ball_space sphere ${a_ball_x} ${a_ball_y} ${A_BALL_HEIGHT} 7 units box
+group                   a_ball region a_ball_space
+fix			a_ball_no_go a_ball setforce 0.0 0.0 0.0
+# }}}
+
+# Reshape the grapheneish membrane 
+# {{{
+# Keep a circle
+# region			notDel sphere 150 150 0 ${SHEET_RADIUS} units box
+# group			notDel region notDel
+# group			del subtract all notDel
+# delete_atoms		group del
+# Cut a small circle to act as an rozpraszacz
+region			doDel sphere 140 150 0 2 units box
+region			B_doDel sphere 160 150 0 2 units box
+group			del region doDel
+group			B_del region B_doDel
+delete_atoms		group del
+delete_atoms		group B_del
+# }}}
+
+# Potential settings
+# {{{
+# TODO not sure what is this for really
+neighbor        	3.0 bin
+neigh_modify    	every 1 delay 0
+
+pair_style		lj/cut 10.
+pair_coeff      	* * 0 1  1
+
+# LJ is now only for interaction between membrane and bouncers
+# pair_coeff              1 1  5.5939 1.26  10
+pair_coeff      	1 2  0.0000001139 19.510832  10
+pair_coeff      	2 2  0.1939 3.510832  10
+
+# Membrane holding potential
+bond_coeff		1 ${MEM_K} ${MEM_R0}
+create_bonds            graphene graphene 1 2.1 3.0
+# }}}
+
+# Full data dump
+# {{{
+# Get membrane z-position mean value
+compute			mem_com graphene com
+variable		z_dev atom c_mem_com[3]-z
+dump			my_dump all custom 10 interference.lammpstrj type x y z v_z_dev
+dump_modify		my_dump sort id 
+# dump                    my_dump all atom 160 pilotwaves.lammpstrj
+thermo                  5000
+thermo_style		custom step temp ke
+# }}}
+
+# Setup timestep and NVE
+# {{{
+fix                     NVE all nve
+timestep		6
+# }}}
+
+# Wacing sheet 
+# Every point of the membrane is a forced oscillator {{{
+fix                     graphene_spring graphene spring/self ${SPRING_CONSTANT} z
+# With sinusoidal driving force
+variable		sin_force equal swiggle(0,${AMPLITUDE},${MEMBRANE_FREQUENCY})
+fix                     wavee graphene addforce 0.0 0.0 v_sin_force
+# Allow graphene atoms to move up or down only
+fix			move_vertical graphene setforce 0.0 0.0 NULL
+# }}}
+
+# Write some coordinates to a seperate files
+# {{{
+# First ball
+compute			fa_com a_ball com
+variable                fa_x_com equal c_fa_com[1]
+variable                fa_y_com equal c_fa_com[2]
+variable                fa_z_com equal c_fa_com[3]
+
+fix			a_ball_cout all print 10 "${fa_x_com} ${fa_y_com} ${fa_z_com}" file data/a_ball.dat screen no
+
+# Some part of the membrane
+region			membrane_part sphere 100 100 0 3 units box
+group			membrane_pos region membrane_part
+compute			mpart_com membrane_pos com
+variable                mpart_x_com equal c_mpart_com[1]
+variable                mpart_y_com equal c_mpart_com[2]
+variable                mpart_z_com equal c_mpart_com[3]
+fix			memb_cout all print 160 "${mpart_x_com} ${mpart_y_com} ${mpart_z_com}" file data/membrane_pos.dat screen no
+# }}}
+
+# Reach oscillatory stability 
+# Start standing still {{{
+velocity		all set 0 0 0 units box
+# Prevent energy accumulation
+fix			vis all viscous 2
+run                     4000
+# }}}
+
+# Drop the ball
+# {{{
+unfix			a_ball_no_go
+fix                     a_gravity a_ball addforce 0.0 0.0 ${GRAVITY}
+# With velocityo
+velocity		a_ball set 0.0 0.013 0.0
+# }}}
+
+run			${ITERATIONS}
