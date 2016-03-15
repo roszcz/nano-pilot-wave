@@ -181,14 +181,14 @@ if __name__ == '__main__':
     runner.set_sheet_radius(sheet_radius)
 
     # Ball starting postion-y
-    y_position = [50 + 5 * np.random.random() for _ in range(1000)]
+    y_position = [10 + 5 * np.random.random() for _ in range(100)]
 
     # And x
     x_position = 150
     runner.set_a_ball_x(x_position)
 
     # Starting velocity
-    y_velocity = 0.01 + 19*0.001
+    y_velocity = 0.3
     runner.set_a_ball_y_vel(y_velocity)
 
     # Declare score paths
@@ -200,7 +200,7 @@ if __name__ == '__main__':
     membranes_z = []
 
     # Final settings
-    runner.set_number_of_iterations(6000)
+    runner.set_number_of_iterations(20000)
     runner.set_number_of_cores(8)
 
     for val in y_position:
