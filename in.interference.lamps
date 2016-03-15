@@ -34,6 +34,11 @@ fix			a_ball_no_go a_ball setforce 0.0 0.0 0.0
 
 # Reshape the grapheneish membrane 
 # {{{
+# Keep a rectangle
+region			notDel block 50 250 0 300 -5 5 units box
+group			notDel region notDel
+group			del subtract graphene notDel
+delete_atoms		group del
 # Keep a circle
 # region			notDel sphere 150 150 0 ${SHEET_RADIUS} units box
 # group			notDel region notDel
@@ -119,7 +124,7 @@ fix			memb_cout all print 160 "${mpart_x_com} ${mpart_y_com} ${mpart_z_com}" fil
 # Start standing still {{{
 velocity		all set 0 0 0 units box
 # Prevent energy accumulation
-fix			vis all viscous 2
+fix			vis graphene viscous 2
 run                     4000
 # }}}
 
@@ -128,7 +133,7 @@ run                     4000
 unfix			a_ball_no_go
 fix                     a_gravity a_ball addforce 0.0 0.0 ${GRAVITY}
 # With velocityo
-velocity		a_ball set 0.0 0.013 0.0
+velocity		a_ball set 0.0 ${a_ball_y_vel} 0.0
 # }}}
 
 run			${ITERATIONS}
