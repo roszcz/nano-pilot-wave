@@ -165,7 +165,7 @@ if __name__ == '__main__':
     runner.set_amplitude(amplitudes)
 
     # Membrane size
-    sheet_radius    = 88
+    sheet_radius    = 68
     runner.set_sheet_radius(sheet_radius)
 
     # Ball starting postion-y
@@ -189,7 +189,7 @@ if __name__ == '__main__':
     runner.set_mb_bond_r(membrane_r_zeros)
 
     # Starting velocity
-    y_velocity = 0.01
+    y_velocity = 0.001
     runner.set_a_ball_y_vel(y_velocity)
 
     # Declare score paths
@@ -201,10 +201,10 @@ if __name__ == '__main__':
     membranes_z = []
 
     # Final settings
-    runner.set_number_of_iterations(40000)
+    runner.set_number_of_iterations(int(1e6))
     runner.set_number_of_cores(4)
 
-    for val in membrane_r_zeros:
+    for val in range(1):
         print 'current value is now set to: ', val
         # Set value to check and check
 
