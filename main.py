@@ -165,7 +165,7 @@ if __name__ == '__main__':
     runner.set_amplitude(amplitudes)
 
     # Membrane size
-    sheet_radius    = 68
+    sheet_radius    = 38
     runner.set_sheet_radius(sheet_radius)
 
     # And x
@@ -200,8 +200,8 @@ if __name__ == '__main__':
     membranes_z = []
 
     # Final settings
-    runner.set_number_of_iterations(int(2e5))
-    runner.set_number_of_cores(4)
+    runner.set_number_of_iterations(int(2e7))
+    runner.set_number_of_cores(8)
 
     for val in y_position:
         print 'current value is now set to: ', val
