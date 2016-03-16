@@ -134,10 +134,10 @@ class LampsRunner(object):
                     ]
 
         # Silent
-	# call(commands, stdout=open(os.devnull, 'wb'))
+	call(commands, stdout=open(os.devnull, 'wb'))
 
         # Verbose
-	call(commands)
+	# call(commands)
 
 if __name__ == '__main__':
     """ Run lammps multiple times with python main.py """
@@ -147,14 +147,6 @@ if __name__ == '__main__':
     # Spring constant of the membrane points
     spring_factors  = 1.12
     runner.set_spring_constant(spring_factors)
-
-    # Membrane harmonic constant
-    membrane_bond_ks = 0.6
-    runner.set_membrane_bond_harmonic_constant(membrane_bond_ks)
-
-    # Membrane bonds equilibric distances
-    membrane_r_zeros = 1.76
-    runner.set_mb_bond_r(membrane_r_zeros)
 
     # Freefall force
     gravity         = 13.01
@@ -172,16 +164,13 @@ if __name__ == '__main__':
     amplitudes      = 0.05
     runner.set_amplitude(amplitudes)
 
-    # 102.01 and 112.01 gave great results
-    a_ball_mass     = 121
-    runner.set_a_ball_mass(a_ball_mass)
-
     # Membrane size
     sheet_radius    = 88
     runner.set_sheet_radius(sheet_radius)
 
     # Ball starting postion-y
-    y_position = [10 + 5 * np.random.random() for _ in range(100)]
+    y_position = 150
+    runner.set_a_ball_y(y_position)
 
     # And x
     x_position = 150
@@ -190,6 +179,17 @@ if __name__ == '__main__':
     # Starting velocity
     y_velocity = 0.3
     runner.set_a_ball_y_vel(y_velocity)
+
+    # Membrane harmonic constant
+    membrane_bond_ks = 1.36
+    runner.set_membrane_bond_harmonic_constant(membrane_bond_ks)
+
+    # 102.01 and 112.01 gave great results
+    a_ball_mass     = 220
+    runner.set_a_ball_mass(a_ball_mass)
+
+    # Membrane bonds equilibric distances
+    membrane_r_zeros = [1.5 + 0.01 * it for it in range(100)]
 
     # Declare score paths
     ball_file = 'data/a_ball.dat'
@@ -201,13 +201,15 @@ if __name__ == '__main__':
 
     # Final settings
     runner.set_number_of_iterations(20000)
-    runner.set_number_of_cores(8)
+    runner.set_number_of_cores(4)
 
-    for val in y_position:
+    for val in membrane_r_zeros:
         print 'current value is now set to: ', val
         # Set value to check and check
+        runner.set_mb_bond_r(val)
+
+        # Run
         runner.run_it(ference_file)
-        runner.set_a_ball_y(val)
 
         # Write ball positions
         ball_score = an.read_pos(ball_file)
