@@ -176,10 +176,6 @@ if __name__ == '__main__':
     x_position = 150
     runner.set_a_ball_x(x_position)
 
-    # Starting velocity
-    y_velocity = 0.3
-    runner.set_a_ball_y_vel(y_velocity)
-
     # Membrane harmonic constant
     membrane_bond_ks = 1.36
     runner.set_membrane_bond_harmonic_constant(membrane_bond_ks)
@@ -189,7 +185,12 @@ if __name__ == '__main__':
     runner.set_a_ball_mass(a_ball_mass)
 
     # Membrane bonds equilibric distances
-    membrane_r_zeros = [1.5 + 0.01 * it for it in range(100)]
+    membrane_r_zeros = 1.61
+    runner.set_mb_bond_r(membrane_r_zeros)
+
+    # Starting velocity
+    y_velocity = 0.01
+    runner.set_a_ball_y_vel(y_velocity)
 
     # Declare score paths
     ball_file = 'data/a_ball.dat'
@@ -200,13 +201,12 @@ if __name__ == '__main__':
     membranes_z = []
 
     # Final settings
-    runner.set_number_of_iterations(20000)
+    runner.set_number_of_iterations(40000)
     runner.set_number_of_cores(4)
 
     for val in membrane_r_zeros:
         print 'current value is now set to: ', val
         # Set value to check and check
-        runner.set_mb_bond_r(val)
 
         # Run
         runner.run_it(ference_file)

@@ -133,9 +133,9 @@ run                     4000
 # Drop the ball
 # {{{
 unfix			a_ball_no_go
-fix                     a_gravity a_ball addforce 0.0 ${a_ball_y_vel} ${GRAVITY}
+fix                     a_gravity a_ball addforce 0.0 0.0 ${GRAVITY}
 # With velocityo
-# velocity		a_ball set 0.0 ${a_ball_y_vel} 0.0
+velocity		a_ball set 0.0 ${a_ball_y_vel} 0.0
 # }}}
 
 run			${ITERATIONS}
