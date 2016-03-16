@@ -165,7 +165,7 @@ if __name__ == '__main__':
     runner.set_amplitude(amplitudes)
 
     # Membrane size
-    sheet_radius    = 55
+    sheet_radius    = 45
     runner.set_sheet_radius(sheet_radius)
 
     # And x
@@ -181,7 +181,7 @@ if __name__ == '__main__':
     runner.set_a_ball_mass(a_ball_mass)
 
     # Membrane bonds equilibric distances
-    membrane_r_zeros = 1.61
+    membrane_r_zeros = 1.1
     runner.set_mb_bond_r(membrane_r_zeros)
 
     # Starting velocity

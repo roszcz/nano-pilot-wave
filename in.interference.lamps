@@ -12,7 +12,7 @@ read_data               structures/fake_bonds.what
 # Create graphene sheet
 # {{{
 bond_style              harmonic
-lattice			sc ${MEM_R0}
+lattice			hcp ${MEM_R0}
 region                  graphene_space block -5 320 -5 320 -0.1 0.1 units box
 # read_dump               structures/30nm_30nm_graphene.what 0 x y z box no add yes
 create_atoms		1 region graphene_space
@@ -71,7 +71,7 @@ pair_coeff      	2 2  0.1939 3.510832  10
 
 # Membrane holding potential
 bond_coeff		1 ${MEM_K} ${MEM_R0}
-create_bonds            graphene graphene 1 2.0 3.0
+create_bonds            graphene graphene 1 2.0 2.8
 # }}}
 
 # Full data dump
