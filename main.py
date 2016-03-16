@@ -134,10 +134,10 @@ class LampsRunner(object):
                     ]
 
         # Silent
-	call(commands, stdout=open(os.devnull, 'wb'))
+	# call(commands, stdout=open(os.devnull, 'wb'))
 
         # Verbose
-	# call(commands)
+	call(commands)
 
 if __name__ == '__main__':
     """ Run lammps multiple times with python main.py """
@@ -168,10 +168,6 @@ if __name__ == '__main__':
     sheet_radius    = 68
     runner.set_sheet_radius(sheet_radius)
 
-    # Ball starting postion-y
-    y_position = 150
-    runner.set_a_ball_y(y_position)
-
     # And x
     x_position = 150
     runner.set_a_ball_x(x_position)
@@ -192,6 +188,9 @@ if __name__ == '__main__':
     y_velocity = 0.001
     runner.set_a_ball_y_vel(y_velocity)
 
+    # Ball starting postion-y
+    y_position = [150 + 0.1 * np.random.random() for _ in range(100)]
+
     # Declare score paths
     ball_file = 'data/a_ball.dat'
     memb_file = 'data/membrane_pos.dat'
@@ -201,12 +200,13 @@ if __name__ == '__main__':
     membranes_z = []
 
     # Final settings
-    runner.set_number_of_iterations(int(1e6))
+    runner.set_number_of_iterations(int(2e5))
     runner.set_number_of_cores(4)
 
-    for val in range(1):
+    for val in y_position:
         print 'current value is now set to: ', val
         # Set value to check and check
+        runner.set_a_ball_y(val)
 
         # Run
         runner.run_it(ference_file)
