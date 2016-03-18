@@ -134,10 +134,10 @@ class LampsRunner(object):
                     ]
 
         # Silent
-	call(commands, stdout=open(os.devnull, 'wb'))
+	# call(commands, stdout=open(os.devnull, 'wb'))
 
         # Verbose
-	# call(commands)
+	call(commands)
 
 if __name__ == '__main__':
     """ Run lammps multiple times with python main.py """
@@ -161,7 +161,7 @@ if __name__ == '__main__':
     runner.set_amplitude(amplitudes)
 
     # Membrane size
-    sheet_radius    = 55
+    sheet_radius    = 79
     runner.set_sheet_radius(sheet_radius)
 
     # And x
@@ -189,7 +189,8 @@ if __name__ == '__main__':
     runner.set_gravity(gravity)
 
     # 102.01 and 112.01 gave great results
-    a_ball_mass     = [180 + it * 10 for it in range(20)]
+    a_ball_mass     = 404
+    runner.set_a_ball_mass(a_ball_mass)
 
     # Declare score paths
     ball_file = 'data/a_ball.dat'
@@ -200,13 +201,12 @@ if __name__ == '__main__':
     membranes_z = []
 
     # Final settings
-    runner.set_number_of_iterations(int(5e4))
+    runner.set_number_of_iterations(int(1e7))
     runner.set_number_of_cores(8)
 
-    for val in a_ball_mass:
+    for val in range(1):
         print 'current value is now set to: ', val
         # Set value to check and check
-        runner.set_a_ball_mass(val)
 
         # Run
         runner.run_it(ference_file)
