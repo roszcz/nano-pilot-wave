@@ -201,7 +201,7 @@ if __name__ == '__main__':
     membranes_z = []
 
     # Final settings
-    runner.set_number_of_iterations(int(1e7))
+    runner.set_number_of_iterations(int(5e7))
     runner.set_number_of_cores(8)
 
     for val in range(1):
