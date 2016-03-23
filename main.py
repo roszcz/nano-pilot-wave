@@ -161,7 +161,7 @@ if __name__ == '__main__':
     runner.set_amplitude(amplitudes)
 
     # Membrane size
-    sheet_radius    = 89
+    sheet_radius    = 100
     runner.set_sheet_radius(sheet_radius)
 
     # And x
@@ -229,8 +229,3 @@ if __name__ == '__main__':
             pickle.dump(ball_pos, fout)
         with open('data/memb.pickle', 'wb') as fout:
             pickle.dump(membranes_z, fout)
-
-
-
-    # score_file  = 'data/oscillations.dat'
-    # anal.make_position_histogram(score_file)

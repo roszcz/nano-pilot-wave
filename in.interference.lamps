@@ -77,14 +77,15 @@ create_bonds            graphene graphene 1 2.0 2.8
 # Full data dump
 # {{{
 # FIXME move this out (also rename) - data dump frequency
-variable		f equal 20
+variable		f equal 160
 
-# Get membrane z-position mean value
+# Get membrane z-position mean value (not used?)
 compute			mem_com graphene com
 variable		z_dev atom c_mem_com[3]-z
-dump			my_dump all custom $f interference.lammpstrj type x y z v_z_dev
-dump_modify		my_dump sort id 
-# dump                    my_dump all atom 160 pilotwaves.lammpstrj
+
+# dump			my_dump all custom $f interference.lammpstrj type x y z v_z_dev
+# dump_modify		my_dump sort id 
+# # dump                    my_dump all atom 160 pilotwaves.lammpstrj
 thermo                  5000
 thermo_style		custom step temp ke
 # }}}
