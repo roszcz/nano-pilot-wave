@@ -36,16 +36,19 @@ fix			a_ball_no_go a_ball setforce 0.0 0.0 0.0
 
 # Reshape the grapheneish membrane 
 # {{{
+
 # Keep a rectangle
 # region			notDel block 100 200 0 300 -5 5 units box
 # group			notDel region notDel
 # group			del subtract graphene notDel
 # delete_atoms		group del
+
 # Keep a circle
 region			notDel sphere 150 150 0 ${SHEET_RADIUS} units box
 group			notDel region notDel
 group			del subtract all notDel
 delete_atoms		group del
+
 # Cut a small circle to act as an rozpraszacz
 # region			doDel sphere 135 150 0 2 units box
 # region			B_doDel sphere 165 150 0 2 units box
@@ -61,13 +64,13 @@ delete_atoms		group del
 neighbor        	3.0 bin
 neigh_modify    	every 1 delay 0
 
-pair_style		lj/cut 10.
+pair_style		lj/cut 10
 pair_coeff      	* * 0 1  1
 
 # LJ is now only for interaction between membrane and bouncers
 # pair_coeff              1 1  5.5939 1.26  10
 pair_coeff      	1 2  0.0000001139 19.510832  10
-pair_coeff      	2 2  0.1939 3.510832  10
+pair_coeff      	2 2  0.1939 3.510832  1
 
 # Membrane holding potential
 bond_coeff		1 ${MEM_K} ${MEM_R0}
@@ -77,15 +80,17 @@ create_bonds            graphene graphene 1 2.0 2.8
 # Full data dump
 # {{{
 # FIXME move this out (also rename) - data dump frequency
-variable		f equal 160
+variable		dump_freq equal 40
 
 # Get membrane z-position mean value (not used?)
 compute			mem_com graphene com
 variable		z_dev atom c_mem_com[3]-z
 
-# dump			my_dump all custom $f interference.lammpstrj type x y z v_z_dev
-# dump_modify		my_dump sort id 
-# # dump                    my_dump all atom 160 pilotwaves.lammpstrj
+# Dump just the membrane information
+dump			my_dump graphene custom ${dump_freq} membrane.lammpstrj type x y z v_z_dev
+dump_modify		my_dump sort id 
+
+# dump                    my_dump 1 atom 160 pilotwaves.lammpstrj
 thermo                  5000
 thermo_style		custom step temp ke
 # }}}
@@ -114,7 +119,7 @@ variable                fa_x_com equal c_fa_com[1]
 variable                fa_y_com equal c_fa_com[2]
 variable                fa_z_com equal c_fa_com[3]
 
-fix			a_ball_cout all print $f "${fa_x_com} ${fa_y_com} ${fa_z_com}" file data/a_ball.dat screen no
+fix			a_ball_cout all print ${dump_freq} "${fa_x_com} ${fa_y_com} ${fa_z_com}" file data/a_ball.dat screen no
 
 # Some part of the membrane
 region			membrane_part sphere 100 100 0 3 units box

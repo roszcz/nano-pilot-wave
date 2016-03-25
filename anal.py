@@ -68,7 +68,11 @@ def get_coords(frame):
 def make_membrane_map(frame, savepath=None):
     """ Change frame into a colormaped png """
     x, y, z = get_coords(frame)
-    plt.scatter(x, y, c=z, edgecolors='face')
+    # Normalize z
+    # TODO check if its worthy
+    z -= z.min()
+    z /= z.max()
+    plt.scatter(x, y, c=z, s=10, edgecolors='face')
 
     if not savepath:
 	plt.show()
