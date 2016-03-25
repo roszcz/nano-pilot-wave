@@ -15,3 +15,5 @@ log.*
 tags
 
 *.xyz
+
+png/*

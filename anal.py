@@ -1,3 +1,4 @@
+from simpy import analyze as sa
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -42,6 +43,37 @@ def read_pos(filepath):
 	    out.append([float(val) for val in vals])
 
     return out
+
+def get_frames(filepath, howmany = -1):
+    """ Load lammpstrj coordinates as a set of frames """
+    tr = sa.traj(filepath)
+    frames = tr.read(howmany)
+
+    return frames
+
+def get_coords(frame):
+    """ Transform frame into numpy xyz vectors """
+    coords = frame[2]
+    xx = [pos[0] for pos in coords]
+    yy = [pos[1] for pos in coords]
+    zz = [pos[2] for pos in coords]
+
+    # Transform to numpy
+    nx = np.asarray(xx)
+    ny = np.asarray(yy)
+    nz = np.asarray(zz)
+
+    return nx, ny, nz
+
+def make_membrane_map(frame, savepath=None):
+    """ Change frame into a colormaped png """
+    x, y, z = get_coords(frame)
+    plt.scatter(x, y, c=z, edgecolors='face')
+
+    if not savepath:
+	plt.show()
+    else:
+	plt.savefig(savepath)
 
 if __name__ == '__main__':
     """ %run this.file.py """
