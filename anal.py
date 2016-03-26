@@ -72,12 +72,15 @@ def make_membrane_map(frame, savepath=None):
     # TODO check if its worthy
     z -= z.min()
     z /= z.max()
-    plt.scatter(x, y, c=z, s=10, edgecolors='face')
+    # This is way faster than just plt.plotting
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.scatter(x, y, c=z, s=10, edgecolors='face')
 
     if not savepath:
-	plt.show()
+	fig.show()
     else:
-	plt.savefig(savepath)
+	fig.savefig(savepath)
 
 if __name__ == '__main__':
     """ %run this.file.py """
