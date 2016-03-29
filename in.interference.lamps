@@ -62,7 +62,7 @@ delete_atoms		group del
 # {{{
 # TODO not sure what is this for really
 neighbor        	3.0 bin
-neigh_modify    	every 1 delay 0
+neigh_modify    	every 2 delay 0
 
 pair_style		lj/cut 10
 pair_coeff      	* * 0 1  1
@@ -80,15 +80,15 @@ create_bonds            graphene graphene 1 2.0 2.8
 # Full data dump
 # {{{
 # FIXME move this out (also rename) - data dump frequency
-variable		dump_freq equal 10
+variable		dump_freq equal 160
 
 # Get membrane z-position mean value (not used?)
 compute			mem_com graphene com
 variable		z_dev atom c_mem_com[3]-z
 
 # Dump just the membrane information
-dump			my_dump graphene custom ${dump_freq} membrane.lammpstrj type x y z v_z_dev
-dump_modify		my_dump sort id 
+# dump			my_dump graphene custom ${dump_freq} membrane.lammpstrj type x y z v_z_dev
+# dump_modify		my_dump sort id 
 
 # dump                    my_dump 1 atom 160 pilotwaves.lammpstrj
 thermo                  5000
@@ -98,7 +98,7 @@ thermo_style		custom step temp ke
 # Setup timestep and NVE
 # {{{
 fix                     NVE all nve
-timestep		6
+timestep		10
 # }}}
 
 # Wacing sheet 
