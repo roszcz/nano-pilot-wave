@@ -161,7 +161,7 @@ if __name__ == '__main__':
     runner.set_amplitude(amplitudes)
 
     # Membrane size
-    sheet_radius    = 95
+    sheet_radius    = 91
     runner.set_sheet_radius(sheet_radius)
 
     # And x
