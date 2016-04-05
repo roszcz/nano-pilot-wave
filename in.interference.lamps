@@ -80,7 +80,7 @@ create_bonds            graphene graphene 1 2.0 2.8
 # Full data dump
 # {{{
 # FIXME move this out (also rename) - data dump frequency
-variable		dump_freq equal 100
+variable		dump_freq equal 50
 
 # Get membrane z-position mean value (not used?)
 compute			mem_com graphene com

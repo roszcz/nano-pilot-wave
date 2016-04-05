@@ -41,6 +41,8 @@ class LampsRunner(object):
         self.a_ball_y_vel_m      = 'a_ball_y_vel'
         self.a_ball_y_vel        = '0.013'
 
+        self.silent              = True
+
     def set_membrane_bond_harmonic_constant(self, kz):
         """ wow """
         self.mb_bond_k = str(kz)
@@ -97,6 +99,10 @@ class LampsRunner(object):
         """ Starting velocity """
         self.a_ball_y_vel = str(vel)
 
+    def set_silent(self, isit):
+        """ lammps thermos on/off """
+        self.silent = isit
+
     def run_it(self, filepath):
 	""" Runs lammps """
         # Unix mp-ready version
@@ -133,20 +139,16 @@ class LampsRunner(object):
                     '-var', self.a_ball_x_m, self.a_ball_x
                     ]
 
-        # Silent
-	# call(commands, stdout=open(os.devnull, 'wb'))
-
-        # Verbose
-	call(commands)
+        if self.silent:
+            call(commands, stdout=open(os.devnull, 'wb'))
+        else:
+            # Verbose
+            call(commands)
 
 if __name__ == '__main__':
     """ Run lammps multiple times with python main.py """
 
     runner = LampsRunner()
-
-    # Spring constant of the membrane points
-    spring_factors  = 1.12
-    runner.set_spring_constant(spring_factors)
 
     # Membrane driving force frequency
     frequencies     = 1000
@@ -161,16 +163,12 @@ if __name__ == '__main__':
     runner.set_amplitude(amplitudes)
 
     # Membrane size
-    sheet_radius    = 111
+    sheet_radius    = 70
     runner.set_sheet_radius(sheet_radius)
 
     # And x
     x_position = 150
     runner.set_a_ball_x(x_position)
-
-    # Membrane harmonic constant
-    membrane_bond_ks = 1.36
-    runner.set_membrane_bond_harmonic_constant(membrane_bond_ks)
 
     # Membrane bonds equilibric distances
     membrane_r_zeros = 1.1
@@ -188,9 +186,17 @@ if __name__ == '__main__':
     gravity         = 43.1
     runner.set_gravity(gravity)
 
-    # 102.01 and 112.01 gave great results
-    a_ball_mass     = 404
+    # 102.01 and 112.01 gave great results (404)
+    a_ball_mass     = [320.2 + 0.0005 * it for it in range(60)][6]
     runner.set_a_ball_mass(a_ball_mass)
+
+    # Membrane harmonic constant 1.36
+    membrane_bond_ks = 1.36
+    runner.set_membrane_bond_harmonic_constant(membrane_bond_ks)
+
+    # Spring constant of the membrane points 1.12
+    spring_factors  = 1.076
+    runner.set_spring_constant(spring_factors)
 
     # Declare score paths
     ball_file = 'data/a_ball.dat'
@@ -201,7 +207,8 @@ if __name__ == '__main__':
     membranes_z = []
 
     # Final settings
-    runner.set_number_of_iterations(int(5e8))
+    runner.set_silent(False)
+    runner.set_number_of_iterations(int(1e8))
     runner.set_number_of_cores(8)
 
     for val in range(1):
